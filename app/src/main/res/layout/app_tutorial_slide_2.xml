@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorSlide_2">
+
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/camera"
+        android:layout_centerHorizontal="true"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="150dp"
+        android:id="@+id/thermometer"/>
+
+    <TextView
+        android:id="@+id/tutorial_temperature"
+        android:layout_marginTop="30dp"
+        android:layout_below="@id/thermometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="Take a picture of your breast and get the analysis results accordingly"
+        android:textSize="30sp"
+        android:textColor="@color/colorPrimary"/>
+
+
+</RelativeLayout>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SelectImageActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!--BUTTON TO CAPTURE IMAGE FROM CAMERA-->
+        <Button
+            android:id="@+id/bTakePhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="TAKE PHOTO"
+            android:textColor="#FFFFFF"
+            android:background="@color/colorPrimaryDark"
+            />
+</RelativeLayout>
+
+<RelativeLayout
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_weight="1">
+
+<!--BUTTON TO PICK IMAGE FROM GALLERY-->
+<Button
+    android:id="@+id/bFromGallery"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:text="FROM GALLERY"
+    android:textColor="#FFFFFF"
+    android:background="@color/colorPrimaryDark"
+    />
+
+</RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

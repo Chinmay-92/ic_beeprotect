@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/black">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/truiton_image"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/text2"
+        android:textColor="#FFFFFF"
+        android:text="Pain Intensity"
+        android:textSize="30sp"/>
+
+    <!-- use Material.Widget.Slider.Discrete style for discrete mode -->
+    <com.rey.material.widget.Slider
+        style="@style/Material.Widget.Slider"
+        android:layout_width="match_parent"
+        android:id="@+id/slider1"
+        android:layout_below="@id/text2"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:sl_textColor="@android:color/white"
+        app:sl_primaryColor="@android:color/holo_blue_light"
+        app:sl_trackCap="round"
+        app:sl_discreteMode="true"
+        app:sl_minValue="0"
+        app:sl_maxValue="100"
+        app:sl_value="50"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:layout_marginBottom="44dp"
+        android:layout_marginLeft="120dp"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_background"
+        android:id="@+id/submit"
+        />
+<!--    android:layout_below="@id/slider1"-->
+
+</RelativeLayout>

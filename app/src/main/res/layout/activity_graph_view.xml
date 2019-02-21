@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+    tools:context=".GraphViewing">
+
+    <TextView android:id="@+id/title_paired_devices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="I'm visible"
+        android:visibility="visible"
+        android:background="#009688"
+        android:textColor="@android:color/black"
+        android:paddingLeft="5dp"
+        />
+
+    <!--<com.jjoe64.graphview.GraphView
+        android:id="@id/graph"
+        android:layout_below="@id/title_paired_devices"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/> -->
+
+    <com.gc.materialdesign.views.Slider
+        android:id="@+id/slider"
+        android:layout_below="@id/title_paired_devices"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#1E88E5"
+        materialdesign:max="50"
+        materialdesign:min="0"
+        materialdesign:showNumberIndicator="true"/>
+
+
+</RelativeLayout>

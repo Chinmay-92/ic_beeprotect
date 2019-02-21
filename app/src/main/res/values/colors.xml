@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#40BAEB</color>
+    <color name="colorPrimaryDark">#682cbf</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="breasts">#009888</color>
+    <color name="cancer">#526eff</color>
+    <color name="fibroadenoma">#682cbf</color>
+    <color name="gynecomastia">#50342c</color>
+    <color name="mastitis">#ff9a00</color>
+    <color name="normal">#ffcd00</color>
+    <color name="not">#9e9e9e</color>
+    <color name="button_color">#40BAEB</color>
+
+    <color name="colorSlide_1">#ffffff</color>
+    <color name="colorSlide_2">#ffffff</color>
+    <color name="colorSlide_3">#ffffff</color>
+    <color name="colorSlide_4">#ffffff</color>
+
+    <color name="active_dots">@android:color/darker_gray</color>
+    <color name="inactive_dots">#03070b</color>
+</resources>
