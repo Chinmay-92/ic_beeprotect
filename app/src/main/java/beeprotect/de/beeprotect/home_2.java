@@ -2,11 +2,12 @@ package beeprotect.de.beeprotect;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.fragment.app.Fragment;
 
 public class home_2 extends Fragment {
     public static home_2 newInstance() {
