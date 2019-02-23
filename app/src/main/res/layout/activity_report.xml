@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ReportActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
     <!--<com.google.android.material.card.MaterialCardView
         android:id="@+id/card"
         style="@style/Widget.MaterialComponents.CardView"
@@ -24,7 +21,7 @@
     </com.google.android.material.card.MaterialCardView>-->
 <!--    android:layout_below="@id/card"-->
 
-    <android.support.design.card.MaterialCardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/card"
         style="@style/Widget.MaterialComponents.CardView"
         android:layout_width="match_parent"
@@ -143,18 +140,9 @@
         android:layout_below="@id/mlresponse"
         android:layout_centerHorizontal="true"/>
 
-    </android.support.design.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
 
-</RelativeLayout>
+    </RelativeLayout>
 
-<com.google.android.material.bottomappbar.BottomAppBar
-    android:id="@+id/bottom_app_bar"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    app:backgroundTint="@color/colorPrimary"
-    app:fabAlignmentMode="center"
-    app:fabAttached="true"
-    app:navigationIcon="@drawable/ic_launcher"/>
 
-</android.support.design.widget.CoordinatorLayout>
+

@@ -23,6 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +50,7 @@ public class TensorflowActivity extends AppCompatActivity {
     TextView mastitislbl,fibroadenomalbl,gynecomastialbl,normallbl,cancerlbl;
     byte[] byteArray;
     private TextView[] btns = new TextView[10];
-    private Button bSelectImage;
+    private FloatingActionButton bSelectImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class TensorflowActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tensorflow);
 
         mTextView = (TextView) findViewById(R.id.text);
-        bSelectImage = (Button) findViewById(R.id.bSelectImage);
+        bSelectImage = (FloatingActionButton) findViewById(R.id.bSelectImage);
         mastitis = findViewById(R.id.mastitis_value);
         fibroadenoma = findViewById(R.id.fibroadenoma_value);
         gynecomastia = findViewById(R.id.gynecomastia_value);
