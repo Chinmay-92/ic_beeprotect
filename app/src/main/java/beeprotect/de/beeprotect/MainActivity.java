@@ -14,10 +14,14 @@ import java.util.UUID;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.WallpaperManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -26,51 +30,56 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import androidx.appcompat.app.AppCompatActivity;
+import at.grabner.circleprogress.CircleProgressView;
 
 public class MainActivity extends AppCompatActivity {
-  private static final String TAG = "LEDOnOff";
-  
-  Button btnOn, btnOff;
-  Button next;
-  TextView text, bluetooth_val,mtext;
+    private static final String TAG = "LEDOnOff";
+
+    Button btnOn, btnOff;
+    Button next;
+    TextView text, bluetooth_val,mtext;
 
 
-  private static final Random RANDOM = new Random();
-  private LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
-  private LineGraphSeries<DataPoint> seriesRight = new LineGraphSeries<DataPoint>();
-  private int lastX = 0;
-  List<Float> tempDiff = new ArrayList<>();
+    private static final Random RANDOM = new Random();
+    private LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
+    private LineGraphSeries<DataPoint> seriesRight = new LineGraphSeries<DataPoint>();
+    private int lastX = 0;
+    List<Float> tempDiff = new ArrayList<>();
 
-  private BluetoothAdapter btAdapter = null;
-  private BluetoothSocket btSocket = null;
-  private OutputStream outStream = null;
-  private InputStream inStream = null;
-  List<String> values = new ArrayList<String>();
-  List<String> valuesRight = new ArrayList<String>();
+    private BluetoothAdapter btAdapter = null;
+    private BluetoothSocket btSocket = null;
+    private OutputStream outStream = null;
+    private InputStream inStream = null;
+    List<String> values = new ArrayList<String>();
+    List<String> valuesRight = new ArrayList<String>();
 
-  DataInputStream dataInputStream = null;
-  // Intent request codes
-  private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-  private static final int REQUEST_ENABLE_BT = 3;
-  
-  // Well known SPP UUID
-  private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    DataInputStream dataInputStream = null;
+    // Intent request codes
+    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
+    private static final int REQUEST_ENABLE_BT = 3;
 
-  // Insert your bluetooth devices MAC address
-  private static String address = "98:D3:51:F5:E1:45";
-  
-  /** Called when the activity is first created. */
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
+    // Well known SPP UUID
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    // Insert your bluetooth devices MAC address
+    private static String address = "98:D3:51:F5:E1:45";
+
+    CircleProgressView loadingView;
+
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     mtext = findViewById(R.id.waitText);
@@ -78,29 +87,55 @@ public class MainActivity extends AppCompatActivity {
     btnOff = (Button) findViewById(R.id.btnOff);
     text = (TextView) findViewById(R.id.textEdit);
     bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
-*/
+    */
     /*btnOn.setEnabled(false);
     btnOff.setEnabled(false);
-*/
-changeText(); // timer for the text below
-      next = findViewById(R.id.temptotensor);
+    */
 
-      next.setOnClickListener(new View.OnClickListener() {
+    loadingView = findViewById(R.id.loadingView);
+
+
+    /*final int progress=10;
+    for (int i=0;i<50;i++){
+        final int count = i;
+
+    }*/
+
+    final Handler loadhandler = new Handler();
+    final int min = 1;
+    final int max = 100;
+    loadhandler.postDelayed(new Runnable() {
         @Override
-        public void onClick(View view) {
-          double diff = calculateAverage(tempDiff);
-          TestData.newInstance().setTemperatureDifference(Math.abs(diff));
-          Log.d("testdata",""+Math.abs(diff));
-          Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
-          Intent intent=new Intent(getApplicationContext(), TensorflowActivity.class);
-          startActivity(intent);
-          finish();
+        public void run() {
+            Random r = new Random();
+            int i1 = r.nextInt(max - min + 1) + min;
+            //Do something after 100ms
+            loadingView.setValue(i1);
+            //loadingView.set
         }
+    }, 1500);
 
-      });
-      bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
+    //animate();
 
-      btAdapter = BluetoothAdapter.getDefaultAdapter();
+    changeText(); // timer for the text below
+    next = findViewById(R.id.temptotensor);
+
+    next.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      double diff = calculateAverage(tempDiff);
+      TestData.newInstance().setTemperatureDifference(Math.abs(diff));
+      Log.d("testdata",""+Math.abs(diff));
+      Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
+      Intent intent=new Intent(getApplicationContext(), TensorflowActivity.class);
+      startActivity(intent);
+      finish();
+    }
+
+    });
+    bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
+
+    btAdapter = BluetoothAdapter.getDefaultAdapter();
 
     checkBTState();
 
@@ -110,8 +145,9 @@ changeText(); // timer for the text below
     final Handler delayed = new Handler();
     final int delay = 6000; //milliseconds
     final GraphView graph = (GraphView) findViewById(R.id.graph);
-    final GraphView graphRight = (GraphView) findViewById(R.id.graphright);
+    //final GraphView graphRight = (GraphView) findViewById(R.id.graphright);
 
+    mockdata();
     //values.add("21");
 
     Runnable getTemp = new Runnable() {
@@ -163,34 +199,58 @@ changeText(); // timer for the text below
     //if (btSocket!=null)
     (new Handler()).postDelayed(getTemp, 1000);
 
-      if (values.size() > 0) {
+    if (values.size() > 0) {
         addEntry();
-      }
-      graph.addSeries(series);
+    }
+    graph.getLegendRenderer().setVisible(true);
+    series.setTitle("Left sensor");
+    graph.addSeries(series);
 
     if (valuesRight.size() > 0) {
-      addEntryRight();
+        addEntryRight();
     }
-      graphRight.addSeries(seriesRight);
+    Viewport viewport = graph.getViewport();
+    viewport.setYAxisBoundsManual(true);
+    viewport.setMinY(15);
+    viewport.setMaxY(40);
+    viewport.setMaxX(4);
+    viewport.setScalable(true);
 
-      Viewport viewport = graph.getViewport();
-      viewport.setYAxisBoundsManual(true);
-      viewport.setMinY(15);
-      viewport.setMaxY(40);
-      viewport.setMaxX(4);
-      viewport.setScalable(true);
-
-    Viewport viewportRight = graphRight.getViewport();
+    graph.getSecondScale().addSeries(seriesRight);
+    seriesRight.setTitle("Right sensor");
+    seriesRight.setColor(Color.RED);
+    graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.RED);
+    graph.getSecondScale().setMinY(15);
+    graph.getSecondScale().setMaxY(40);
+    graph.getLegendRenderer().setVisible(true);
+    graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+    /*Viewport viewportRight = graph.getViewport();
     viewportRight.setYAxisBoundsManual(true);
     viewportRight.setMinY(15);
     viewportRight.setMaxY(40);
     viewportRight.setMaxX(4);
-    viewportRight.setScalable(true);
+    viewportRight.setScalable(true);*/
 
   }
 
+    private void mockdata() {
+        values.add("21");
+        valuesRight.add("29");
+    }
 
-  @Override
+    private void animate() {
+        /*Drawable[] drawables
+                = loadingView.getCompoundDrawables();
+        for (Drawable drawable : drawables) {
+            if (drawable != null &&
+                    drawable instanceof Animatable) {
+                ((Animatable) drawable).start();
+            }
+        }*/
+    }
+
+
+    @Override
   protected void onResume() {
     super.onResume();
 
@@ -239,9 +299,12 @@ changeText(); // timer for the text below
   }
 
   private void addEntryRight() {
-    Log.d("entry",values.toString());
+    Log.d("entry right",valuesRight.toString());
     //if (values.size() > counter) {
     seriesRight.appendData(new DataPoint(lastX++, Double.valueOf(valuesRight.get(valuesRight.size() - 1))), true, 46);
+    counter = counter + 5;
+    loadingView.setValue(Float.valueOf(valuesRight.get(valuesRight.size()-1)) - Float.valueOf(values.get(values.size()-1)) + counter);
+    loadingView.animate();
     //Log.d("adding into graph","added"+values.get(values.size()-1));
     //}
   }

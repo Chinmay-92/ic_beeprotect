@@ -23,8 +23,8 @@ public class ReportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_report);
 
         cancerprob = findViewById(R.id.cancerchances);
-        tempdiff = findViewById(R.id.tempdifference);
-        pain = findViewById(R.id.painpercent);
+        //tempdiff = findViewById(R.id.tempdifference);
+        //pain = findViewById(R.id.painpercent);
 
 
         Button exit = findViewById(R.id.exit);

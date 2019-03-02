@@ -6,20 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".ReportActivity">
 
-    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/picture2">
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/black">
 
-    <ImageView android:id="@+id/imageView1"
-        android:layout_height="250dp"
-        android:src="@drawable/ic_photo_camera_white_24dp"
-        android:layout_width="250dp"
-        android:layout_gravity="center_horizontal">
-    </ImageView>
+        <ImageView android:id="@+id/imageView1"
+            android:layout_height="200dp"
+            android:layout_width="200dp"
+            android:layout_gravity="center_horizontal">
+        </ImageView>
+    <!--<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:text="Preview"/>-->
 
     <!--<Button
         android:id="@+id/bSelectImage"
@@ -33,17 +39,7 @@
         android:background="@drawable/button_background"
         android:layout_gravity="center_horizontal"/>-->
 
-    <Button android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Proceed"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_background"
-        android:layout_gravity="center_horizontal">
-    </Button>
-
-    <TextView
+    <!--<TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="28sp"
@@ -51,10 +47,11 @@
         android:gravity="center_horizontal"
         android:textColor="#FFFFFF"
         android:layout_gravity="center_horizontal"
-        android:text="Results"/>
+        android:text="Results"/>-->
 
     <TableLayout
         android:id="@+id/resultstable"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_margin="10dp"
         android:layout_marginTop="10dp"
@@ -127,25 +124,47 @@
 
     </TableLayout>
 
+    <!--<com.jjoe64.graphview.GraphView
+        android:id="@+id/graph"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" />-->
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/chart1"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        />
+
+    <Button android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Proceed"
+        android:layout_marginBottom="10dp"
+        android:textColor="#FFFFFF"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button_background"
+        android:layout_gravity="center_horizontal">
+    </Button>
+
 </LinearLayout>
 </ScrollView>
 
-<com.google.android.material.bottomappbar.BottomAppBar
-android:id="@+id/bottom_app_bar"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:layout_gravity="bottom"
-app:backgroundTint="@color/colorPrimary"
-app:fabAlignmentMode="center"
-app:fabAttached="true"
-app:navigationIcon="@drawable/ic_menu"
+    <com.google.android.material.bottomappbar.BottomAppBar
+    android:id="@+id/bottom_app_bar"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_gravity="bottom"
+    app:backgroundTint="@color/colorPrimary"
+    app:fabAlignmentMode="center"
+    app:fabAttached="true"
     />
 
-<com.google.android.material.floatingactionbutton.FloatingActionButton
-android:id="@+id/bSelectImage"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:src="@drawable/ic_add"
-app:layout_anchor="@id/bottom_app_bar" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/bSelectImage"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/ic_add"
+    app:layout_anchor="@id/bottom_app_bar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

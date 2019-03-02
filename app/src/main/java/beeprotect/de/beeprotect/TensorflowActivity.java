@@ -5,10 +5,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,7 +27,24 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.MPPointF;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,15 +52,19 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 
 import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
 public class TensorflowActivity extends AppCompatActivity {
+    //GraphView graph;
     private static final int CAMERA_REQUEST = 1888;
     private static final int REQUEST_SELECT_IMAGE = 0;
     private ImageView imageView;
@@ -51,12 +76,17 @@ public class TensorflowActivity extends AppCompatActivity {
     byte[] byteArray;
     private TextView[] btns = new TextView[10];
     private FloatingActionButton bSelectImage;
+    PieChart chart;
+    List<Float>graphValues = new ArrayList<>();
+    List<String>graphLabels = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tensorflow);
 
+        BottomAppBar bottomAppBar = findViewById(R.id.bottom_app_bar);
+        setSupportActionBar(bottomAppBar);
         mTextView = (TextView) findViewById(R.id.text);
         bSelectImage = (FloatingActionButton) findViewById(R.id.bSelectImage);
         mastitis = findViewById(R.id.mastitis_value);
@@ -64,6 +94,71 @@ public class TensorflowActivity extends AppCompatActivity {
         gynecomastia = findViewById(R.id.gynecomastia_value);
         normal = findViewById(R.id.normal_value);
         cancer = findViewById(R.id.cancer_value);
+
+
+        /*//BAR GRAPH
+        graph = findViewById(R.id.graph);
+
+        // set the viewport wider than the data, to have a nice view
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(100);
+        graph.getViewport().setXAxisBoundsManual(false);*/
+
+        chart = findViewById(R.id.chart1);
+        chart.setUsePercentValues(true);
+        chart.getDescription().setEnabled(false);
+        chart.setExtraOffsets(3, 7, 3, 2);
+
+        chart.setDragDecelerationFrictionCoef(0.95f);
+
+        //chart.setCenterTextTypeface(tfLight);
+        chart.setCenterText("Tensorflow results");
+
+        chart.setDrawHoleEnabled(true);
+        chart.setHoleColor(Color.WHITE);
+
+        chart.setTransparentCircleColor(Color.WHITE);
+        chart.setTransparentCircleAlpha(110);
+
+        chart.setHoleRadius(38f);
+        chart.setTransparentCircleRadius(31f);
+
+        chart.setDrawCenterText(true);
+
+        chart.setRotationAngle(0);
+        // enable rotation of the chart by touch
+        chart.setRotationEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
+
+        // chart.setUnit(" €");
+        // chart.setDrawUnitsInChart(true);
+
+        /*// add a selection listener
+        chart.setOnChartValueSelectedListener(this);*/
+
+        chart.animateY(1400, Easing.EaseInOutQuad);
+        Legend l = chart.getLegend();
+        l.setTextColor(Color.WHITE);
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setXEntrySpace(8f);
+        l.setYEntrySpace(1f);
+        l.setYOffset(1f);
+
+        // entry label styling
+        chart.setEntryLabelColor(Color.BLACK);
+        //chart.setEntryLabelTypeface(tfRegular);
+        chart.setEntryLabelTextSize(15f);
+
+        graphLabels.add("cancer");
+        graphLabels.add("mastitis");
+        graphLabels.add("normal");
+        graphValues.add(20.0f);
+        graphValues.add(40.0f);
+        graphValues.add(40.0f);
+        setData(graphValues,graphLabels);
 
         btns[0]=mastitis;
         btns[1]=fibroadenoma;
@@ -111,9 +206,89 @@ public class TensorflowActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
+        new SimpleTooltip.Builder(this)
+                .anchorView(bSelectImage)
+                .text("Click to select your breast picture")
+                .gravity(Gravity.TOP).textColor(Color.WHITE)
+                .backgroundColor(getResources().getColor(R.color.colorPrimary))
+                .arrowColor(getResources().getColor(R.color.colorPrimary))
+                .animated(true)
+                .transparentOverlay(false)
+                .build()
+                .show();
     }
 
-        @Override
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.tensor_menu, menu);
+        return true;
+    }
+
+    private void setData(List<Float> value, List<String> name) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+        // the chart.
+        //for (int i = 0; i < count ; i++) {
+            /*entries.add(new PieEntry((float) ((Math.random() * range) + range / 5),
+                    //parties[i % parties.length],
+                    getResources().getDrawable(R.drawable.ic_bluetooth_)));*/
+        for (int i=0;i<value.size();i++) {
+            PieEntry e = new PieEntry(value.get(i), name.get(i));
+            entries.add(e);
+        }
+        //}
+
+        PieDataSet dataSet = new PieDataSet(entries, "Types");
+
+        dataSet.setDrawIcons(false);
+
+        dataSet.setSliceSpace(7f);
+        //dataSet.setIconsOffset(new MPPointF(0, 40));
+        dataSet.setSelectionShift(15f);
+
+        // add a lot of colors
+
+        ArrayList<Integer> colors = new ArrayList<>();
+
+        for (int c : ColorTemplate.VORDIPLOM_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.JOYFUL_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.LIBERTY_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.PASTEL_COLORS)
+            colors.add(c);
+
+        colors.add(ColorTemplate.getHoloBlue());
+
+        dataSet.setColors(colors);
+        //dataSet.setSelectionShift(0f);
+
+        PieData data = new PieData(dataSet);
+        //data.setValueFormatter(new PercentFormatter(chart));
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.BLACK);
+        //data.setValueTypeface(tfLight);
+        chart.setData(data);
+
+
+        // undo all highlights
+        chart.highlightValues(null);
+
+        chart.invalidate();
+    }
+
+    @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             if (requestCode == MY_CAMERA_PERMISSION_CODE) {
@@ -198,6 +373,14 @@ public class TensorflowActivity extends AppCompatActivity {
                     String diseasetype = "breasts";
                     JSONObject jsonresponse = new JSONObject(response);
                     JSONArray array = jsonresponse.getJSONArray("predictions");
+                    /*BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
+                            new DataPoint(2, 3),
+                            new DataPoint(3, 2)
+                    });*/
+                    DataPoint[] points = new DataPoint[array.length()];
+
+                    List<Integer> list = new ArrayList<>();
+
                     for (int i = 1; i < array.length(); i++) {
                         String probabilityString = new DecimalFormat("##").format(Double.valueOf(array.getJSONObject(i).getDouble("probability")) * 100);
                         diseasetype = array.getJSONObject(i).getString("tagName");
@@ -207,8 +390,36 @@ public class TensorflowActivity extends AppCompatActivity {
                             cancerResult=probabilityString;
                         btns[i-1].setText(probabilityString + "%");
                         btns[i+4].setText(diseasetype);
-
+                        list.add(Integer.valueOf(probabilityString));
+                        //points[i-1] = new DataPoint(i+2, Double.valueOf(array.getJSONObject(i).getDouble("probability")));
+                        //series.appendData(point,true,100);
                     }
+
+                    DataPoint [] statsArray;
+                    if(list.size() > 0) {
+                        // Code for list longer than 0, query return something
+                        statsArray = new DataPoint[list.size()]; // so this is not null now
+                        for (int i = 0; i < statsArray.length; i++) {
+                            statsArray[i] = new DataPoint(i+1, list.get(i));
+                            // i+1  to start from x = 1
+                        }
+                    }else{
+                        // Query return nothing, so we add some fake point
+                        // IT WON'T BE VISIBLE cus we starts graph from 1
+                        statsArray = new DataPoint[] {new DataPoint(0, 0)};
+                    }
+                    /*BarGraphSeries<DataPoint> series = new BarGraphSeries<DataPoint>();*/
+
+                    /*int dataptr = 0;
+                    for (dataptr=0;dataptr<=points.length;dataptr++){
+                        series.appendData(points[dataptr],false,points.length);
+                    }*/
+                    BarGraphSeries<DataPoint> series = new BarGraphSeries<>(statsArray);
+
+                    series.setSpacing(40); // 50% spacing between bars
+                    series.setAnimated(true);
+                    //graph.addSeries(series);
+
                 }catch(JSONException je){
                     je.printStackTrace();
                 }

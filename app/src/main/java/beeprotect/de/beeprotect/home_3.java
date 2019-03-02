@@ -38,8 +38,8 @@ public class home_3 extends Fragment {
         View rootView = inflater.inflate(R.layout.activity_report, container, false);
 
         cancerprob = rootView.findViewById(R.id.cancerchances);
-        tempdiff = rootView.findViewById(R.id.tempdifference);
-        pain = rootView.findViewById(R.id.painpercent);
+        //tempdiff = rootView.findViewById(R.id.tempdifference);
+        //pain = rootView.findViewById(R.id.painpercent);
 
 
         Button exit = rootView.findViewById(R.id.exit);

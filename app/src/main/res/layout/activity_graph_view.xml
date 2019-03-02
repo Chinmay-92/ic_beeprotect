@@ -17,11 +17,23 @@
         android:paddingLeft="5dp"
         />
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="animation"
+        android:layout_below="@id/title_paired_devices"
+        android:drawableRight=
+            "@drawable/ic_bluetooth_"
+        android:drawableBottom=
+            "@drawable/animated_clock"/>
+
     <!--<com.jjoe64.graphview.GraphView
         android:id="@id/graph"
         android:layout_below="@id/title_paired_devices"
         android:layout_width="match_parent"
-        android:layout_height="300dp"/> -->
+        android:layout_height="300dp"/>-->
 
     <com.gc.materialdesign.views.Slider
         android:id="@+id/slider"
