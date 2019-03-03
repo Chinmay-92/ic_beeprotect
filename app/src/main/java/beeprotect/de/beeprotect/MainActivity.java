@@ -39,9 +39,13 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.polidea.rxandroidble2.RxBleClient;
+import com.polidea.rxandroidble2.RxBleDevice;
 
 import androidx.appcompat.app.AppCompatActivity;
 import at.grabner.circleprogress.CircleProgressView;
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "LEDOnOff";
@@ -100,6 +104,56 @@ public class MainActivity extends AppCompatActivity {
         final int count = i;
 
     }*/
+
+
+    //TODO test BLE
+    String macAddress = "CC:50:E3:99:13:D6";
+    //String characteristicUUID = "fddbffd7-98b6-4898-b7d7-c6afe982e728";
+    RxBleClient rxBleClient = RxBleClient.create(getApplicationContext());
+
+    RxBleDevice device = rxBleClient.getBleDevice(macAddress);
+    UUID characteristicUUID = UUID.fromString("fddbffd7-98b6-4898-b7d7-c6afe982e728");
+
+    device.establishConnection(true) // <-- autoConnect flag
+            .flatMapSingle(rxBleConnection -> rxBleConnection.readCharacteristic(characteristicUUID))
+            .subscribe(
+                    characteristicValue -> {
+                        // Read characteristic value.
+                        Log.d(TAG,"value:- "+characteristicValue);
+                    },
+                    throwable -> {
+                        // Handle an error here.
+                        Log.d(TAG,"error value:- "+throwable.getLocalizedMessage());
+                    }
+            );
+        /*.subscribe(
+                rxBleConnection -> {
+                    Single<byte[]> characteristicValue = rxBleConnection.readCharacteristic(characteristicUUID);
+                    // All GATT operations are done through the rxBleConnection.
+                    Log.d(TAG,"value:- "+characteristicValue);
+                },
+                throwable -> {
+                    // Handle an error here.
+                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
+                }
+        )*/;
+
+    /*device.establishConnection(true)
+        .flatMapSingle(rxBleConnection -> rxBleConnection.readCharacteristic(characteristicUUID))
+        .subscribe(
+                characteristicValue -> {
+                    // Read characteristic value.
+                    Log.d(TAG,"value:- "+characteristicValue);
+                },
+                throwable -> {
+                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
+                }
+        );*/
+
+    // When done... dispose and forget about connection teardown :)
+    //disposable.dispose();
+
+
 
     final Handler loadhandler = new Handler();
     final int min = 1;
