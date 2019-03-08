@@ -1,14 +1,14 @@
 package beeprotect.de.beeprotect;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.AbstractQueue;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -19,8 +19,6 @@ import android.app.FragmentTransaction;
 import android.app.WallpaperManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Color;
@@ -28,8 +26,9 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,65 +38,35 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.polidea.rxandroidble2.NotificationSetupMode;
-import com.polidea.rxandroidble2.RxBleClient;
-import com.polidea.rxandroidble2.RxBleConnection;
-import com.polidea.rxandroidble2.RxBleDevice;
-import com.polidea.rxandroidble2.utils.ConnectionSharingAdapter;
-import com.trello.rxlifecycle.android.ActivityEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import at.grabner.circleprogress.CircleProgressView;
 
-
-/*import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.subjects.PublishSubject;
-import rx.android.schedulers.AndroidSchedulers;*/
-
-import java.util.UUID;
-
-//import io.reactivex.Observable;
-//import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.PublishSubject;
-//import rx.android.schedulers.AndroidSchedulers;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.PublishSubject;
-import static com.trello.rxlifecycle.RxLifecycle.bindUntilEvent;
-//import rx.android.schedulers.AndroidSchedulers;
-//import io.reactivex.android.schedulers.AndroidSchedulers;
-
-//import rx.android.schedulers.AndroidSchedulers;
-//import rx.subjects.PublishSubject;
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "LEDOnOff";
-
+    Thread workerThread;
+    byte[] readBuffer;
+    int readBufferPosition;
+    int counter = 0;
+    BufferedReader dataBufferReader;
+    volatile boolean stopWorker;
     Button btnOn, btnOff;
     Button next;
     TextView text, bluetooth_val,mtext;
-
+    Runnable getTemp;
+    private Handler myHandler = new Handler();
 
     private static final Random RANDOM = new Random();
     private LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
     private LineGraphSeries<DataPoint> seriesRight = new LineGraphSeries<DataPoint>();
     private int lastX = 0;
     List<Float> tempDiff = new ArrayList<>();
-
+    HandlerThread readThread;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
@@ -114,157 +83,204 @@ public class MainActivity extends AppCompatActivity {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Insert your bluetooth devices MAC address
-    private static String address = "98:D3:51:F5:E1:45";
+    private static String address = "CC:50:E3:99:13:D6"; //"98:D3:51:F5:E1:45";
 
     CircleProgressView loadingView;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-    mtext = findViewById(R.id.waitText);
-    /*btnOn = (Button) findViewById(R.id.btnOn);
-    btnOff = (Button) findViewById(R.id.btnOff);
-    text = (TextView) findViewById(R.id.textEdit);
-    bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
-    */
-    /*btnOn.setEnabled(false);
-    btnOff.setEnabled(false);
-    */
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mtext = findViewById(R.id.waitText);
+        /*btnOn = (Button) findViewById(R.id.btnOn);
+        btnOff = (Button) findViewById(R.id.btnOff);
+        text = (TextView) findViewById(R.id.textEdit);
+        bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
+        */
+        /*btnOn.setEnabled(false);
+        btnOff.setEnabled(false);
+        */
 
-    loadingView = findViewById(R.id.loadingView);
+        loadingView = findViewById(R.id.loadingView);
 
 
-    /*final int progress=10;
-    for (int i=0;i<50;i++){
-        final int count = i;
+        /*final int progress=10;
+        for (int i=0;i<50;i++){
+            final int count = i;
+        }*/
 
-    }*/
+        /*final Handler loadhandler = new Handler();
+        final int min = 1;
+        final int max = 100;
+        loadhandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Random r = new Random();
+                int i1 = r.nextInt(max - min + 1) + min;
+                //Do something after 100ms
+                loadingView.setValue(i1);
+                //loadingView.set
+            }
+        }, 1500);*/
 
-    final Handler loadhandler = new Handler();
-    final int min = 1;
-    final int max = 100;
-    loadhandler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-            Random r = new Random();
-            int i1 = r.nextInt(max - min + 1) + min;
-            //Do something after 100ms
-            loadingView.setValue(i1);
-            //loadingView.set
-        }
-    }, 1500);
+        //animate();
 
-    //animate();
+        //changeText(); // timer for the text below
+        next = findViewById(R.id.temptotensor);
 
-    changeText(); // timer for the text below
-    next = findViewById(R.id.temptotensor);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                double diff = calculateAverage(tempDiff);
+                TestData.newInstance().setTemperatureDifference(Math.abs(diff));
+                Log.d("testdata",""+Math.abs(diff));
+                Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(getApplicationContext(), TensorflowActivity.class);
+                startActivity(intent);
+                finish();
+            }
 
-    next.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-      double diff = calculateAverage(tempDiff);
-      TestData.newInstance().setTemperatureDifference(Math.abs(diff));
-      Log.d("testdata",""+Math.abs(diff));
-      Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
-      Intent intent=new Intent(getApplicationContext(), TensorflowActivity.class);
-      startActivity(intent);
-      finish();
-    }
+        });
+        bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
 
-    });
-    bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-    btAdapter = BluetoothAdapter.getDefaultAdapter();
+        checkBTState();
 
-    checkBTState();
+        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
 
-    Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+        final Handler delayed = new Handler();
+        final int delay = 200; //milliseconds
+        final GraphView graph = (GraphView) findViewById(R.id.graph);
+        //final GraphView graphRight = (GraphView) findViewById(R.id.graphright);
 
-    final Handler handler = new Handler();
-    final Handler delayed = new Handler();
-    final int delay = 6000; //milliseconds
-    final GraphView graph = (GraphView) findViewById(R.id.graph);
-    //final GraphView graphRight = (GraphView) findViewById(R.id.graphright);
+        //mockdata();
+        //values.add("21");
 
-    //mockdata();  //TODO mock data
-    //values.add("21");
+        /*HandlerThread readThread = new HandlerThread("");
+        readThread.start();
+        myHandler = new Handler(readThread.getLooper());*/
 
-    Runnable getTemp = new Runnable() {
-      public void run() {
-        //do something
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    int bytes = 0;
+                    byte[] buffer = new byte[256];
+
+
+                    try {
+                        if (btSocket != null && btSocket.isConnected() && dataInputStream != null) {
+                            bytes = dataInputStream.read(buffer);
+                            String readMessage = new String(buffer, 0, bytes);
+                            String readMessageRight = new String(buffer, 0, bytes);
+                            Log.d("readmessage #386", readMessage);
+                        } else {
+                            SystemClock.sleep(100);
+                        }
+                    }catch (IOException io) {
+                        Log.d("IOException",io.getLocalizedMessage());
+                    }
+                }
+            });
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                t.start();
+            }
+        }, 5000);
+
+
+        getTemp = new Runnable() {
+            public void run() {
+                //do something
+                try {
+                    beginListenForData();
+                    int bytes = 0;
+                    Integer[] arr = null;
+                    byte[] buffer = new byte[256];
+                    if (dataInputStream!=null)
+                        bytes = dataInputStream.read(buffer);
+                    String readMessage = new String(buffer, 0, bytes);
+                    String readMessageRight = new String(buffer, 0, bytes);
+                    Log.d("readmessage",readMessage);
+                    bluetooth_val.setText(readMessage);
+                    if (readMessage.contains("\n")) {
+                        readMessageRight = readMessage.split("\n")[1];
+                        readMessage = readMessage.split("\n")[0];
+                        Log.d("split message", readMessage);
+                    }
+                    Log.d("Read Message", readMessage);
+                    Log.d("Read MessageRight", readMessageRight);
+                    if (readMessage.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f) {
+                        values.add(readMessage.trim());
+                    }
+                    if (readMessageRight.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f ) {
+                        valuesRight.add(readMessageRight.trim());
+                    }
+                    if (readMessage.isEmpty())
+                    {}
+                    else
+                        tempDiff.add(Float.valueOf(readMessage.trim())-Float.valueOf(readMessageRight.trim()));
+                    //add_values_to_array(bytes);
+                    bytes = 0;
+                    //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
+                } catch (IOException io) {
+                    io.printStackTrace();
+                } catch (NullPointerException ne) {
+                    ne.printStackTrace();
+                } catch( Exception e){
+                    e.printStackTrace();
+                } catch (Error error){
+                    error.printStackTrace();
+                }
+                myHandler.postDelayed(this, delay);
+            }
+        };
+
+        if (btSocket!=null)
+        (new Handler()).postDelayed(getTemp, 1000);
+
+/*
         try {
-          int bytes = 0;
-          Integer[] arr = null;
-          byte[] buffer = new byte[256];
-          if (dataInputStream!=null)
-          bytes = dataInputStream.read(buffer);
-          String readMessage = new String(buffer, 0, bytes);
-          String readMessageRight = new String(buffer, 0, bytes);
-          Log.d("readmessage",readMessage);
-            bluetooth_val.setText(readMessage);
-            if (readMessage.contains("\n")) {
-              readMessageRight = readMessage.split("\n")[1];
-              readMessage = readMessage.split("\n")[0];
-              Log.d("split message", readMessage);
-            }
-              Log.d("Read Message", readMessage);
-              Log.d("Read MessageRight", readMessageRight);
-            if (readMessage.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f) {
-              values.add(readMessage.trim());
-            }
-            if (readMessageRight.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f ) {
-              valuesRight.add(readMessageRight.trim());
-            }
-            if (readMessage.isEmpty())
-            {}
-            else
-                tempDiff.add(Float.valueOf(readMessage.trim())-Float.valueOf(readMessageRight.trim()));
-          //add_values_to_array(bytes);
-          bytes = 0;
-          //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
-        } catch (IOException io) {
-          io.printStackTrace();
-        } catch (NullPointerException ne) {
-          ne.printStackTrace();
-        } catch( Exception e){
-          e.printStackTrace();
-        } catch (Error error){
-            error.printStackTrace();
+            if (btSocket != null)
+                while (true) {
+                    if (inStream.available() > 0) {
+                        Log.d("AVAILABLLLLLLLLLE", "HERE!");
+                    } else SystemClock.sleep(100);
+                }
+        }catch (IOException op){
+            op.printStackTrace();
         }
-        handler.postDelayed(this, delay);
-      }
-    };
+        //(new Handler()).postDelayed(getTemp, 1000);
 
-    //if (btSocket!=null)
-    (new Handler()).postDelayed(getTemp, 1000);
+        if (values.size() > 0) {
+            addEntry();
+        }
+        graph.getLegendRenderer().setVisible(true);
+        series.setTitle("Left sensor");
+        graph.addSeries(series);
 
-    if (values.size() > 0) {
-        addEntry();
-    }
-    graph.getLegendRenderer().setVisible(true);
-    series.setTitle("Left sensor");
-    graph.addSeries(series);
+        if (valuesRight.size() > 0) {
+            addEntryRight();
+        }
+        Viewport viewport = graph.getViewport();
+        viewport.setYAxisBoundsManual(true);
+        viewport.setMinY(15);
+        viewport.setMaxY(40);
+        viewport.setMaxX(4);
+        viewport.setScalable(true);
 
-    if (valuesRight.size() > 0) {
-        addEntryRight();
-    }
-    Viewport viewport = graph.getViewport();
-    viewport.setYAxisBoundsManual(true);
-    viewport.setMinY(15);
-    viewport.setMaxY(40);
-    viewport.setMaxX(4);
-    viewport.setScalable(true);
-
-    graph.getSecondScale().addSeries(seriesRight);
-    seriesRight.setTitle("Right sensor");
-    seriesRight.setColor(Color.RED);
-    graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.RED);
-    graph.getSecondScale().setMinY(15);
-    graph.getSecondScale().setMaxY(40);
-    graph.getLegendRenderer().setVisible(true);
-    graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+        graph.getSecondScale().addSeries(seriesRight);
+        seriesRight.setTitle("Right sensor");
+        seriesRight.setColor(Color.RED);
+        graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.RED);
+        graph.getSecondScale().setMinY(15);
+        graph.getSecondScale().setMaxY(40);
+        graph.getLegendRenderer().setVisible(true);
+        graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
     /*Viewport viewportRight = graph.getViewport();
     viewportRight.setYAxisBoundsManual(true);
     viewportRight.setMinY(15);
@@ -272,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
     viewportRight.setMaxX(4);
     viewportRight.setScalable(true);*/
 
-  }
+    }
 
     private void mockdata() {
         values.add("21");
@@ -292,219 +308,362 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-  protected void onResume() {
-    super.onResume();
+    protected void onResume() {
+        super.onResume();
 
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        for(int i=0; i<100;i++) {
-          runOnUiThread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                if (values.size() > 0) {
-                  addEntry();
-                  addEntryRight();
+                for(int i=0; i<100;i++) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (values.size() > 0) {
+                                addEntry();
+                                addEntryRight();
+                            }
+                        }
+                    });
+                    try
+                    {
+                        Thread.sleep(10000);
+                    }
+                    catch (InterruptedException e){}
+
                 }
             }
-          });
-          try
-          {
-            Thread.sleep(10000);
-          }
-          catch (InterruptedException e){}
+        }).start();
+    }
 
+    private double calculateAverage(List <Float> marks) {
+        Float sum = 0f;
+        if(!marks.isEmpty()) {
+            for (Float mark : marks) {
+                sum += mark;
+            }
+            return sum.doubleValue() / marks.size();
         }
-      }
-    }).start();
-  }
-
-  private double calculateAverage(List <Float> marks) {
-    Float sum = 0f;
-    if(!marks.isEmpty()) {
-      for (Float mark : marks) {
-        sum += mark;
-      }
-      return sum.doubleValue() / marks.size();
+        return sum;
     }
-    return sum;
-  }
 
-  private int counter = 0;
-  private void addEntry() {
-      Log.d("entry",values.toString());
-      //if (values.size() > counter) {
-      series.appendData(new DataPoint(lastX++, Double.valueOf(values.get(values.size() - 1))), true, 46);
-          //Log.d("adding into graph","added"+values.get(values.size()-1));
-      //}
-  }
-
-  private void addEntryRight() {
-    Log.d("entry right",valuesRight.toString());
-    //if (values.size() > counter) {
-    seriesRight.appendData(new DataPoint(lastX++, Double.valueOf(valuesRight.get(valuesRight.size() - 1))), true, 46);
-    counter = counter + 5;
-    loadingView.setValue(Float.valueOf(valuesRight.get(valuesRight.size()-1)) - Float.valueOf(values.get(values.size()-1)) + counter);
-    loadingView.animate();
-    //Log.d("adding into graph","added"+values.get(values.size()-1));
-    //}
-  }
-
-  public void ledOn(View v){
-
-      for(int i=0; i<values.size(); i++)
-      {
-          bluetooth_val.setText(values.get(i));
-      }
-
-	  //sendData("1");
-      //Toast msg = Toast.makeText(getBaseContext(), "LED is ON", Toast.LENGTH_SHORT);
-      //msg.show();
-  }
-  
-  public void ledOff(View v){
-	  sendData("0");
-      //Toast msg = Toast.makeText(getBaseContext(), "LED is OFF", Toast.LENGTH_SHORT);
-      //msg.show();
-  }
-
-
-
-  public void connectToDevice(String adr) {
-    super.onResume();
-    
-    //enable buttons once connection established.
-   // btnOn.setEnabled(true);
-    //btnOff.setEnabled(true);
-    
-    
-    
-    // Set up a pointer to the remote node using it's address.
-    BluetoothDevice device = btAdapter.getRemoteDevice(adr);
-    
-    // Two things are needed to make a connection:
-    //   A MAC address, which we got above.
-    //   A Service ID or UUID.  In this case we are using the
-    //     UUID for SPP.
-    try {
-      btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
-    } catch (IOException e) {
-      errorExit("Fatal Error", "In onResume() and socket create failed: " + e.getMessage() + ".");
+    private void addEntry() {
+        Log.d("entry",values.toString());
+        //if (values.size() > counter) {
+        series.appendData(new DataPoint(lastX++, Double.valueOf(values.get(values.size() - 1))), true, 46);
+        //Log.d("adding into graph","added"+values.get(values.size()-1));
+        //}
     }
-  
-    // Discovery is resource intensive.  Make sure it isn't going on
-    // when you attempt to connect and pass your message.
-    btAdapter.cancelDiscovery();
-  
-    // Establish the connection.  This will block until it connects.
-    try {
-      btSocket.connect();
-    } catch (IOException e) {
-      try {
-        btSocket.close();
-      } catch (IOException e2) {
-        errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
-      }
+
+    private void addEntryRight() {
+        Log.d("entry right",valuesRight.toString());
+        //if (values.size() > counter) {
+        seriesRight.appendData(new DataPoint(lastX++, Double.valueOf(valuesRight.get(valuesRight.size() - 1))), true, 46);
+        counter = counter + 5;
+        loadingView.setValue(Float.valueOf(valuesRight.get(valuesRight.size()-1)) - Float.valueOf(values.get(values.size()-1)) + counter);
+        loadingView.animate();
+        //Log.d("adding into graph","added"+values.get(values.size()-1));
+        //}
     }
-    
-    // Create a data stream so we can talk to server.
-    try {
-    outStream = btSocket.getOutputStream();
-    inStream = btSocket.getInputStream();
 
-    dataInputStream = new DataInputStream(inStream);
+    public void ledOn(View v){
 
-    } catch (IOException e) {
-      errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
+        for(int i=0; i<values.size(); i++)
+        {
+            bluetooth_val.setText(values.get(i));
+        }
+
+        //sendData("1");
+        //Toast msg = Toast.makeText(getBaseContext(), "LED is ON", Toast.LENGTH_SHORT);
+        //msg.show();
     }
-  }
-  
-  private void checkBTState() {
-    // Check for Bluetooth support and then check to make sure it is turned on
 
-    // Emulator doesn't support Bluetooth and will return null
-    if(btAdapter==null) { 
-      errorExit("Fatal Error", "Bluetooth Not supported. Aborting.");
-    } else {
-      if (btAdapter.isEnabled()) {
-        Log.d(TAG, "...Bluetooth is enabled...");
-      } else {
-        //Prompt user to turn on Bluetooth
-        Intent enableBtIntent = new Intent(btAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-      }
+    public void ledOff(View v){
+        sendData("0");
+        //Toast msg = Toast.makeText(getBaseContext(), "LED is OFF", Toast.LENGTH_SHORT);
+        //msg.show();
     }
-  }
 
-  private void errorExit(String title, String message){
-    Toast msg = Toast.makeText(getBaseContext(), title + " - " + message, Toast.LENGTH_SHORT);
-    msg.show();
-    finish();
-  }
 
-  private void sendData(String message) {
-    byte[] msgBuffer = message.getBytes();
-    try {
-      int bytes = 0;
-      byte[] buffer = new byte[256];
-      //outStream.write(msgBuffer);
-      bytes = dataInputStream.read(buffer);
-      String readMessage = new String(buffer, 0 , bytes);
-      bytes = 0;
-      //Toast.makeText(getApplicationContext(),readMessage,Toast.LENGTH_SHORT).show();
-    } catch (IOException e) {
-      String msg = "In onResume() and an exception occurred during write: " + e.getMessage();      
-      errorExit("Fatal Error", msg);       
+
+    public void connectToDevice(String adr) {
+        super.onResume();
+
+        //enable buttons once connection established.
+         //btnOn.setEnabled(true);
+        //btnOff.setEnabled(true);
+
+
+
+        // Set up a pointer to the remote node using it's address.
+        BluetoothDevice device = btAdapter.getRemoteDevice(adr);
+
+        // Two things are needed to make a connection:
+        //   A MAC address, which we got above.
+        //   A Service ID or UUID.  In this case we are using the
+        //     UUID for SPP.
+        try {
+            btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+        } catch (IOException e) {
+            errorExit("Fatal Error", "In onResume() and socket create failed: " + e.getMessage() + ".");
+        }
+
+        // Discovery is resource intensive.  Make sure it isn't going on
+        // when you attempt to connect and pass your message.
+        btAdapter.cancelDiscovery();
+
+        // Establish the connection.  This will block until it connects.
+        try {
+            btSocket.connect();
+        } catch (IOException e) {
+            try {
+                btSocket.close();
+            } catch (IOException e2) {
+                errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+            }
+        }
+
+        // Create a data stream so we can talk to server.
+        try {
+            outStream = btSocket.getOutputStream();
+            inStream = btSocket.getInputStream();
+
+
+            dataInputStream = new DataInputStream(inStream);
+            /*byte[] buffer = new byte[256];
+            int length = inStream.read(buffer);
+            String text = new String(buffer, 0, length);
+            Log.d("text",text);
+            text = "My message";
+            outStream.write(text.getBytes());*/
+
+
+            //beginListenForData();
+
+
+        } catch (IOException e) {
+            errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
+        }
     }
-  }
-  
-  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-      switch (requestCode) {
-      case REQUEST_CONNECT_DEVICE_SECURE:
-          // When DeviceListActivity returns with a device to connect
-          if (resultCode == Activity.RESULT_OK) {
-              connectDevice(data, true);
-          }
-          break;
-      }
-  }
-  
-  private void connectDevice(Intent data, boolean secure) {
-      // Get the device MAC address
-      address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-      //text.setText("Device Address: " + address);
-      connectToDevice(address);
-      // Get the BluetoothDevice object
-      BluetoothDevice device = btAdapter.getRemoteDevice(address);
-  }
-  
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-      MenuInflater inflater = getMenuInflater();
-      inflater.inflate(R.menu.option_menu, menu);
-      return true;
-  }
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-      Intent serverIntent = null;
-      switch (item.getItemId()) {
-      case R.id.secure_connect_scan:
-          // Launch the DeviceListActivity to see devices and do scan
-          serverIntent = new Intent(this, DeviceListActivity.class);
-          startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-          return true;
-      }
-      return false;
-  }
+
+    void beginListenForData()
+    {
+        final Handler handler = new Handler();
+        final byte delimiter = 10; //This is the ASCII code for a newline character
+
+        stopWorker = false;
+        readBufferPosition = 0;
+        readBuffer = new byte[1024];
+        workerThread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                while(!Thread.currentThread().isInterrupted() && !stopWorker)
+                {
+
+                    try {
+                        dataInputStream = new DataInputStream(inStream);
+                        dataBufferReader
+                                = new BufferedReader(new InputStreamReader(inStream));
+                        if (dataBufferReader != null) {
+                            Log.d(TAG, dataBufferReader.read() + "");
+                        }
+                    }catch (IOException io){
+                        io.printStackTrace();
+                    }
+
+                    /*try
+                    {
+                        int bytes; // bytes returned from read()
+                        byte[] buffer = new byte[256];  // buffer store for the stream
+
+                        bytes = dataInputStream.read(buffer);
+                        String readMessage = new String(buffer, 0, bytes);
+                        Log.d(TAG,readMessage);
+                        //int count = inStream.available();
+
+                        // create buffer
+                        byte[] bs = new byte[256];
+
+                        // read data into buffer
+                        dataInputStream.read(bs);
+                        String str = new String(bs,"UTF-8");
+                        Log.d(TAG,str);
+                        *//*StringBuffer inputLine = new StringBuffer();
+                        String tmp;
+                        tmp = dataBufferReader.readLine();
+                        inputLine.append(tmp);
+                        Log.d(TAG, tmp);*//*
 
 
-  private void changeText() {
-    int delayTime = 20000; // 2 min
-    mtext.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        mtext.setText("Please remove sensors \n and proceed with the next test");
-      }
-    }, delayTime);
-  }
+                        *//*int bytesAvailable = inStream.available();
+                        //if(bytesAvailable > 0)
+                        {
+                            byte[] packetBytes = new byte[inStream.available()];
+                            dataInputStream.read(packetBytes);
+                            for(int i=0;i<inStream.available();i++)
+                            {
+                                byte b = packetBytes[i];
+                                if(b == delimiter)
+                                {
+                                    byte[] encodedBytes = new byte[readBufferPosition];
+                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                    final String data = new String(encodedBytes, "US-ASCII");
+                                    readBufferPosition = 0;
+
+                                    handler.post(new Runnable()
+                                    {
+                                        public void run()
+                                        {
+                                            mtext.setText(data);
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    readBuffer[readBufferPosition++] = b;
+                                }
+                            }
+                        }*//*
+                    }
+                    catch (IOException ex)
+                    {
+                        stopWorker = true;
+                    }*/
+
+                    try {
+                        int bytes = 0;
+                        Integer[] arr = null;
+                        byte[] buffer = new byte[256];
+                        if (dataInputStream!=null)
+                            bytes = dataInputStream.read(buffer);
+                        String readMessage = new String(buffer, 0, bytes);
+                        String readMessageRight = new String(buffer, 0, bytes);
+                        Log.d("readmessage",readMessage);
+                        bluetooth_val.setText(readMessage);
+                        if (readMessage.contains("\n")) {
+                            readMessageRight = readMessage.split("\n")[1];
+                            readMessage = readMessage.split("\n")[0];
+                            Log.d("split message", readMessage);
+                        }
+                        Log.d("Read Message", readMessage);
+                        Log.d("Read MessageRight", readMessageRight);
+                        if (readMessage.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f) {
+                            values.add(readMessage.trim());
+                        }
+                        if (readMessageRight.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f ) {
+                            valuesRight.add(readMessageRight.trim());
+                        }
+                        if (readMessage.isEmpty())
+                        {}
+                        else
+                            tempDiff.add(Float.valueOf(readMessage.trim())-Float.valueOf(readMessageRight.trim()));
+                        //add_values_to_array(bytes);
+                        bytes = 0;
+                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
+                    } catch (IOException io) {
+                        stopWorker = true;
+                        io.printStackTrace();
+                    } catch (NullPointerException ne) {
+                        ne.printStackTrace();
+                    } catch( Exception e){
+                        e.printStackTrace();
+                    } catch (Error error){
+                        error.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        workerThread.start();
+    }
+
+    private void checkBTState() {
+        // Check for Bluetooth support and then check to make sure it is turned on
+
+        // Emulator doesn't support Bluetooth and will return null
+        if(btAdapter==null) {
+            errorExit("Fatal Error", "Bluetooth Not supported. Aborting.");
+        } else {
+            if (btAdapter.isEnabled()) {
+                Log.d(TAG, "...Bluetooth is enabled...");
+            } else {
+                //Prompt user to turn on Bluetooth
+                Intent enableBtIntent = new Intent(btAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+        }
+    }
+
+    private void errorExit(String title, String message){
+        Toast msg = Toast.makeText(getBaseContext(), title + " - " + message, Toast.LENGTH_SHORT);
+        msg.show();
+        finish();
+    }
+
+    private void sendData(String message) {
+        byte[] msgBuffer = message.getBytes();
+        try {
+            int bytes = 0;
+            byte[] buffer = new byte[256];
+            //outStream.write(msgBuffer);
+            bytes = dataInputStream.read(buffer);
+            String readMessage = new String(buffer, 0 , bytes);
+            bytes = 0;
+            //Toast.makeText(getApplicationContext(),readMessage,Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            String msg = "In onResume() and an exception occurred during write: " + e.getMessage();
+            errorExit("Fatal Error", msg);
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE_SECURE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    connectDevice(data, true);
+                }
+                break;
+        }
+    }
+
+    private void connectDevice(Intent data, boolean secure) {
+        // Get the device MAC address
+        address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        //text.setText("Device Address: " + address);
+        connectToDevice(address);
+        // Get the BluetoothDevice object
+        BluetoothDevice device = btAdapter.getRemoteDevice(address);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent serverIntent = null;
+        switch (item.getItemId()) {
+            case R.id.secure_connect_scan:
+                // Launch the DeviceListActivity to see devices and do scan
+                serverIntent = new Intent(this, DeviceListActivity.class);
+                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+                return true;
+        }
+        return false;
+    }
+
+
+    private void changeText() {
+        int delayTime = 20000; // 2 min
+        mtext.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                readThread.quit();
+                mtext.setText("Please remove sensors \n and proceed with the next test");
+            }
+        }, delayTime);
+    }
 }
