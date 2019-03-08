@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
-public class Home_1 extends Fragment {
+public class TutorialFragment extends Fragment {
 
     private ViewPager mPager;
     private int[] layouts = {R.layout.app_tutorial_slide_1, R.layout.app_tutorial_slide_2, R.layout.app_tutorial_slide_3, R.layout.app_tutorial_slide_4};
@@ -20,8 +20,8 @@ public class Home_1 extends Fragment {
     private ImageView[] dots;
 
 
-    public static Home_1 newInstance() {
-        Home_1 fragment = new Home_1();
+    public static TutorialFragment newInstance() {
+        TutorialFragment fragment = new TutorialFragment();
         return fragment;
     }
 

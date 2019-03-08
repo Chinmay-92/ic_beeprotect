@@ -25,14 +25,14 @@ public class HomeActivity extends AppCompatActivity {
 
         toolbar = getSupportActionBar();
         // load the store fragment by default
-        fragment = new Home_1();
+        fragment = new TutorialFragment();
 
 
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setBackgroundColor(2);
         navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigationView.setSelectedItemId(R.id.navigation_dashboard);
-        loadFragment(new home_2());
+        loadFragment(new BeginFragment());
 
     }
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -43,15 +43,15 @@ public class HomeActivity extends AppCompatActivity {
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    fragment = new Home_1();
+                    fragment = new TutorialFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_dashboard:
-                    fragment = new home_2();
+                    fragment = new BeginFragment();
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_notifications:
-                    fragment = new home_3();
+                    fragment = new ReportlisttabFragment();
                     loadFragment(fragment);
                     return true;
             }

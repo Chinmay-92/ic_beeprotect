@@ -16,12 +16,12 @@ import org.json.JSONObject;
 import androidx.fragment.app.Fragment;
 import beeprotect.de.beeprotect.utils.AzureMLUtil;
 
-public class home_3 extends Fragment {
+public class ReportlisttabFragment extends Fragment {
     TextView mlresponse;
     TextView cancerprob,tempdiff,pain;
 
-    public static home_3 newInstance() {
-        home_3 fragment = new home_3();
+    public static ReportlisttabFragment newInstance() {
+        ReportlisttabFragment fragment = new ReportlisttabFragment();
         return fragment;
     }
 

@@ -1,17 +1,27 @@
 package beeprotect.de.beeprotect;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.StrictMode;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.transition.ArcMotion;
+import androidx.transition.ChangeBounds;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
 import beeprotect.de.beeprotect.utils.AzureMLUtil;
 
 public class ReportActivity extends AppCompatActivity {
@@ -23,11 +33,25 @@ public class ReportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_report);
 
         cancerprob = findViewById(R.id.cancerchances);
-        //tempdiff = findViewById(R.id.tempdifference);
-        //pain = findViewById(R.id.painpercent);
+        tempdiff = findViewById(R.id.tempdifference);
+        pain = findViewById(R.id.painpercent);
 
 
         Button exit = findViewById(R.id.exit);
+        /*final ViewGroup transitionsContainer = (ViewGroup) findViewById(R.id.reportLayout);
+        Transition changeBounds = new ChangeBounds();
+        changeBounds.setPathMotion(new ArcMotion());
+        changeBounds.setDuration(500);
+        TransitionManager.beginDelayedTransition(transitionsContainer, changeBounds);
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) exit.getLayoutParams();
+        boolean isReturnAnimation = true;
+        *//*params.gra= isReturnAnimation ? (Gravity.LEFT | Gravity.TOP) :
+                (Gravity.BOTTOM | Gravity.RIGHT);*//*
+        exit.setLayoutParams(params);*/
+
+        /*ShapeDrawable rounded_corners = (ShapeDrawable)exit.getBackground();
+        rounded_corners.getPaint().setColor(Color.RED);*/
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

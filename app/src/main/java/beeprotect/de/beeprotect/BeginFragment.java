@@ -9,9 +9,9 @@ import android.widget.Button;
 
 import androidx.fragment.app.Fragment;
 
-public class home_2 extends Fragment {
-    public static home_2 newInstance() {
-        home_2 fragment = new home_2();
+public class BeginFragment extends Fragment {
+    public static BeginFragment newInstance() {
+        BeginFragment fragment = new BeginFragment();
         return fragment;
     }
     Intent intent;

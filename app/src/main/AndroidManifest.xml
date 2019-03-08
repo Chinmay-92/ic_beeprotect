@@ -63,17 +63,25 @@
             </intent-filter>
             -->
         </activity>
+        <activity android:name=".ReportListActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".TensorflowActivity"
             android:theme="@style/Theme.MaterialComponents.NoActionBar"></activity>
         <activity
             android:name=".HomeActivity"
 
             android:label="BeeProtect">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
 
         <activity android:name=".ESPBLE">

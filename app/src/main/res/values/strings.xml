@@ -62,4 +62,6 @@
     <string name="char_uuid_catch">Your Catch UUID</string>
     <string name="char_uuid_catch_all">Your Catch All UUID</string>
     <string name="char_uuid_missed_calls">Your Missed call UUID</string>
+    <string name="delete">Delete</string>
+    <string name="option">Options</string>
 </resources>
