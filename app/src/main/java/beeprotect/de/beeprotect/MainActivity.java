@@ -1,10 +1,8 @@
 package beeprotect.de.beeprotect;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.AbstractQueue;
 import java.util.ArrayList;
@@ -26,8 +24,6 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,24 +45,18 @@ import at.grabner.circleprogress.CircleProgressView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "LEDOnOff";
-    Thread workerThread;
-    byte[] readBuffer;
-    int readBufferPosition;
-    int counter = 0;
-    BufferedReader dataBufferReader;
-    volatile boolean stopWorker;
+
     Button btnOn, btnOff;
     Button next;
     TextView text, bluetooth_val,mtext;
-    Runnable getTemp;
-    private Handler myHandler = new Handler();
+
 
     private static final Random RANDOM = new Random();
     private LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
     private LineGraphSeries<DataPoint> seriesRight = new LineGraphSeries<DataPoint>();
     private int lastX = 0;
     List<Float> tempDiff = new ArrayList<>();
-    HandlerThread readThread;
+
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
@@ -83,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Insert your bluetooth devices MAC address
-    private static String address = "CC:50:E3:99:13:D6"; //"98:D3:51:F5:E1:45";
+    private static String address = "98:D3:51:F5:E1:45";
 
     CircleProgressView loadingView;
 
@@ -93,22 +83,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mtext = findViewById(R.id.waitText);
-        /*btnOn = (Button) findViewById(R.id.btnOn);
-        btnOff = (Button) findViewById(R.id.btnOff);
-        text = (TextView) findViewById(R.id.textEdit);
-        bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
-        */
-        /*btnOn.setEnabled(false);
-        btnOff.setEnabled(false);
-        */
+    /*btnOn = (Button) findViewById(R.id.btnOn);
+    btnOff = (Button) findViewById(R.id.btnOff);
+    text = (TextView) findViewById(R.id.textEdit);
+    bluetooth_val = (TextView) findViewById(R.id.bluetooth_values);
+    */
+    /*btnOn.setEnabled(false);
+    btnOff.setEnabled(false);
+    */
 
         loadingView = findViewById(R.id.loadingView);
-
-
-        /*final int progress=10;
-        for (int i=0;i<50;i++){
-            final int count = i;
-        }*/
+        loadingView.setMaxValue(15.00f);
+        loadingView.setMinValueAllowed(0.00f);
+    /*final int progress=10;
+    for (int i=0;i<50;i++){
+        final int count = i;
+    }*/
 
         /*final Handler loadhandler = new Handler();
         final int min = 1;
@@ -126,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
         //animate();
 
-        //changeText(); // timer for the text below
+        changeText(); // timer for the text below
         next = findViewById(R.id.temptotensor);
 
         next.setOnClickListener(new View.OnClickListener() {
@@ -150,54 +140,20 @@ public class MainActivity extends AppCompatActivity {
 
         Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
 
+        final Handler handler = new Handler();
         final Handler delayed = new Handler();
-        final int delay = 200; //milliseconds
+        final int delay = 1500; //milliseconds
         final GraphView graph = (GraphView) findViewById(R.id.graph);
         //final GraphView graphRight = (GraphView) findViewById(R.id.graphright);
 
         //mockdata();
         //values.add("21");
+        boolean failed = false;
 
-        /*HandlerThread readThread = new HandlerThread("");
-        readThread.start();
-        myHandler = new Handler(readThread.getLooper());*/
-
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    int bytes = 0;
-                    byte[] buffer = new byte[256];
-
-
-                    try {
-                        if (btSocket != null && btSocket.isConnected() && dataInputStream != null) {
-                            bytes = dataInputStream.read(buffer);
-                            String readMessage = new String(buffer, 0, bytes);
-                            String readMessageRight = new String(buffer, 0, bytes);
-                            Log.d("readmessage #386", readMessage);
-                        } else {
-                            SystemClock.sleep(100);
-                        }
-                    }catch (IOException io) {
-                        Log.d("IOException",io.getLocalizedMessage());
-                    }
-                }
-            });
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //Do something after 100ms
-                t.start();
-            }
-        }, 5000);
-
-
-        getTemp = new Runnable() {
+        Runnable getTemp = new Runnable() {
             public void run() {
                 //do something
                 try {
-                    beginListenForData();
                     int bytes = 0;
                     Integer[] arr = null;
                     byte[] buffer = new byte[256];
@@ -205,15 +161,15 @@ public class MainActivity extends AppCompatActivity {
                         bytes = dataInputStream.read(buffer);
                     String readMessage = new String(buffer, 0, bytes);
                     String readMessageRight = new String(buffer, 0, bytes);
-                    Log.d("readmessage",readMessage);
+                    //Log.d("readmessage",readMessage);
                     bluetooth_val.setText(readMessage);
                     if (readMessage.contains("\n")) {
                         readMessageRight = readMessage.split("\n")[1];
                         readMessage = readMessage.split("\n")[0];
-                        Log.d("split message", readMessage);
+                        //Log.d("split message", readMessage);
                     }
-                    Log.d("Read Message", readMessage);
-                    Log.d("Read MessageRight", readMessageRight);
+                    //Log.d("Read Message", readMessage);
+                    //Log.d("Read MessageRight", readMessageRight);
                     if (readMessage.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f) {
                         values.add(readMessage.trim());
                     }
@@ -222,12 +178,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (readMessage.isEmpty())
                     {}
-                    else
-                        tempDiff.add(Float.valueOf(readMessage.trim())-Float.valueOf(readMessageRight.trim()));
+                    else {
+                        float diff = Float.valueOf(values.get(values.size()-1)) - Float.valueOf(valuesRight.get(valuesRight.size()-1));
+                        String difference = String.format("%.2f", Math.abs(diff));
+                        if (diff<20f) {
+                            tempDiff.add(diff);
+                            Log.d("TempDiff", "" + difference);
+                            loadingView.setValue(Float.valueOf(difference));
+                            loadingView.setText("" + difference);
+                            loadingView.animate();
+                        }
+                    }
                     //add_values_to_array(bytes);
                     bytes = 0;
                     //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
                 } catch (IOException io) {
+                    mtext.setError("Bluetooth is not available");
                     io.printStackTrace();
                 } catch (NullPointerException ne) {
                     ne.printStackTrace();
@@ -236,25 +202,12 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Error error){
                     error.printStackTrace();
                 }
-                myHandler.postDelayed(this, delay);
+                handler.postDelayed(this, delay);
             }
         };
 
-        if (btSocket!=null)
+        //if (btSocket!=null)
         (new Handler()).postDelayed(getTemp, 1000);
-
-/*
-        try {
-            if (btSocket != null)
-                while (true) {
-                    if (inStream.available() > 0) {
-                        Log.d("AVAILABLLLLLLLLLE", "HERE!");
-                    } else SystemClock.sleep(100);
-                }
-        }catch (IOException op){
-            op.printStackTrace();
-        }
-        //(new Handler()).postDelayed(getTemp, 1000);
 
         if (values.size() > 0) {
             addEntry();
@@ -346,8 +299,9 @@ public class MainActivity extends AppCompatActivity {
         return sum;
     }
 
+    private int counter = 0;
     private void addEntry() {
-        Log.d("entry",values.toString());
+        //Log.d("entry",values.toString());
         //if (values.size() > counter) {
         series.appendData(new DataPoint(lastX++, Double.valueOf(values.get(values.size() - 1))), true, 46);
         //Log.d("adding into graph","added"+values.get(values.size()-1));
@@ -355,12 +309,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addEntryRight() {
-        Log.d("entry right",valuesRight.toString());
+        //Log.d("entry right",valuesRight.toString());
         //if (values.size() > counter) {
         seriesRight.appendData(new DataPoint(lastX++, Double.valueOf(valuesRight.get(valuesRight.size() - 1))), true, 46);
         counter = counter + 5;
-        loadingView.setValue(Float.valueOf(valuesRight.get(valuesRight.size()-1)) - Float.valueOf(values.get(values.size()-1)) + counter);
-        loadingView.animate();
+        //loadingView.setValue(Float.valueOf(valuesRight.get(valuesRight.size()-1)) - Float.valueOf(values.get(values.size()-1)) + counter);
+        //loadingView.animate();
         //Log.d("adding into graph","added"+values.get(values.size()-1));
         //}
     }
@@ -389,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         //enable buttons once connection established.
-         //btnOn.setEnabled(true);
+        // btnOn.setEnabled(true);
         //btnOff.setEnabled(true);
 
 
@@ -427,154 +381,11 @@ public class MainActivity extends AppCompatActivity {
             outStream = btSocket.getOutputStream();
             inStream = btSocket.getInputStream();
 
-
             dataInputStream = new DataInputStream(inStream);
-            /*byte[] buffer = new byte[256];
-            int length = inStream.read(buffer);
-            String text = new String(buffer, 0, length);
-            Log.d("text",text);
-            text = "My message";
-            outStream.write(text.getBytes());*/
-
-
-            //beginListenForData();
-
 
         } catch (IOException e) {
             errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
         }
-    }
-
-    void beginListenForData()
-    {
-        final Handler handler = new Handler();
-        final byte delimiter = 10; //This is the ASCII code for a newline character
-
-        stopWorker = false;
-        readBufferPosition = 0;
-        readBuffer = new byte[1024];
-        workerThread = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                while(!Thread.currentThread().isInterrupted() && !stopWorker)
-                {
-
-                    try {
-                        dataInputStream = new DataInputStream(inStream);
-                        dataBufferReader
-                                = new BufferedReader(new InputStreamReader(inStream));
-                        if (dataBufferReader != null) {
-                            Log.d(TAG, dataBufferReader.read() + "");
-                        }
-                    }catch (IOException io){
-                        io.printStackTrace();
-                    }
-
-                    /*try
-                    {
-                        int bytes; // bytes returned from read()
-                        byte[] buffer = new byte[256];  // buffer store for the stream
-
-                        bytes = dataInputStream.read(buffer);
-                        String readMessage = new String(buffer, 0, bytes);
-                        Log.d(TAG,readMessage);
-                        //int count = inStream.available();
-
-                        // create buffer
-                        byte[] bs = new byte[256];
-
-                        // read data into buffer
-                        dataInputStream.read(bs);
-                        String str = new String(bs,"UTF-8");
-                        Log.d(TAG,str);
-                        *//*StringBuffer inputLine = new StringBuffer();
-                        String tmp;
-                        tmp = dataBufferReader.readLine();
-                        inputLine.append(tmp);
-                        Log.d(TAG, tmp);*//*
-
-
-                        *//*int bytesAvailable = inStream.available();
-                        //if(bytesAvailable > 0)
-                        {
-                            byte[] packetBytes = new byte[inStream.available()];
-                            dataInputStream.read(packetBytes);
-                            for(int i=0;i<inStream.available();i++)
-                            {
-                                byte b = packetBytes[i];
-                                if(b == delimiter)
-                                {
-                                    byte[] encodedBytes = new byte[readBufferPosition];
-                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
-                                    final String data = new String(encodedBytes, "US-ASCII");
-                                    readBufferPosition = 0;
-
-                                    handler.post(new Runnable()
-                                    {
-                                        public void run()
-                                        {
-                                            mtext.setText(data);
-                                        }
-                                    });
-                                }
-                                else
-                                {
-                                    readBuffer[readBufferPosition++] = b;
-                                }
-                            }
-                        }*//*
-                    }
-                    catch (IOException ex)
-                    {
-                        stopWorker = true;
-                    }*/
-
-                    try {
-                        int bytes = 0;
-                        Integer[] arr = null;
-                        byte[] buffer = new byte[256];
-                        if (dataInputStream!=null)
-                            bytes = dataInputStream.read(buffer);
-                        String readMessage = new String(buffer, 0, bytes);
-                        String readMessageRight = new String(buffer, 0, bytes);
-                        Log.d("readmessage",readMessage);
-                        bluetooth_val.setText(readMessage);
-                        if (readMessage.contains("\n")) {
-                            readMessageRight = readMessage.split("\n")[1];
-                            readMessage = readMessage.split("\n")[0];
-                            Log.d("split message", readMessage);
-                        }
-                        Log.d("Read Message", readMessage);
-                        Log.d("Read MessageRight", readMessageRight);
-                        if (readMessage.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f) {
-                            values.add(readMessage.trim());
-                        }
-                        if (readMessageRight.trim().length()==5 && Float.valueOf(readMessage.trim())>0f && Float.valueOf(readMessage.trim())<=45f ) {
-                            valuesRight.add(readMessageRight.trim());
-                        }
-                        if (readMessage.isEmpty())
-                        {}
-                        else
-                            tempDiff.add(Float.valueOf(readMessage.trim())-Float.valueOf(readMessageRight.trim()));
-                        //add_values_to_array(bytes);
-                        bytes = 0;
-                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
-                    } catch (IOException io) {
-                        stopWorker = true;
-                        io.printStackTrace();
-                    } catch (NullPointerException ne) {
-                        ne.printStackTrace();
-                    } catch( Exception e){
-                        e.printStackTrace();
-                    } catch (Error error){
-                        error.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        workerThread.start();
     }
 
     private void checkBTState() {
@@ -661,7 +472,6 @@ public class MainActivity extends AppCompatActivity {
         mtext.postDelayed(new Runnable() {
             @Override
             public void run() {
-                readThread.quit();
                 mtext.setText("Please remove sensors \n and proceed with the next test");
             }
         }, delayTime);
