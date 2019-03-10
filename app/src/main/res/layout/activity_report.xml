@@ -49,6 +49,10 @@
         android:gravity="center_horizontal"
         android:hint="Instruction"/>
 
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="28dp"
+        android:layout_height="28dp" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card"

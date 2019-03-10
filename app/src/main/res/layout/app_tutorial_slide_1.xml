@@ -3,17 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/picture2">
-
+    android:background="#B0E0E6">
     <ImageView
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:src="@drawable/thermometer"
+        android:src="@drawable/tutorial_thermometer"
         android:layout_centerHorizontal="true"
         android:scaleType="centerCrop"
         android:layout_marginTop="150dp"
         android:id="@+id/thermometer"/>
-
     <TextView
         android:id="@+id/tutorial_temperature"
         android:layout_marginTop="30dp"
@@ -25,6 +23,5 @@
         android:layout_marginRight="20dp"
         android:text="Test the temperature of your breasts through our heat bee band"
         android:textSize="30sp"
-        android:textColor="#FFFFFF"/>
-
+        android:textColor="#000000"/>
 </RelativeLayout>

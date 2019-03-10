@@ -2,20 +2,33 @@ package beeprotect.de.beeprotect;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +64,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,13 +75,13 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 
 import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 
 public class TensorflowActivity extends AppCompatActivity {
     //GraphView graph;
-    private static final int CAMERA_REQUEST = 1888;
     private static final int REQUEST_SELECT_IMAGE = 0;
     private ImageView imageView;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
@@ -79,12 +95,20 @@ public class TensorflowActivity extends AppCompatActivity {
     PieChart chart;
     List<Float>graphValues = new ArrayList<>();
     List<String>graphLabels = new ArrayList<>();
+    protected static final int CAMERA_REQUEST = 0;
+    protected static final int GALLERY_PICTURE = 1;
+    private Intent pictureActionIntent = null;
+    Bitmap bitmap;
+    String selectedImagePath;
+    Context tensorflowcontext;
+    private static DecimalFormat df2 = new DecimalFormat(".##");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tensorflow);
 
+        tensorflowcontext = this;
         BottomAppBar bottomAppBar = findViewById(R.id.bottom_app_bar);
         setSupportActionBar(bottomAppBar);
         mTextView = (TextView) findViewById(R.id.text);
@@ -152,13 +176,13 @@ public class TensorflowActivity extends AppCompatActivity {
         //chart.setEntryLabelTypeface(tfRegular);
         chart.setEntryLabelTextSize(15f);
 
-        graphLabels.add("cancer");
+        /*graphLabels.add("cancer");
         graphLabels.add("mastitis");
         graphLabels.add("normal");
         graphValues.add(20.0f);
         graphValues.add(40.0f);
         graphValues.add(40.0f);
-        setData(graphValues,graphLabels);
+        setData(graphValues,graphLabels);*/
 
         btns[0]=mastitis;
         btns[1]=fibroadenoma;
@@ -186,7 +210,8 @@ public class TensorflowActivity extends AppCompatActivity {
         bSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                selectImageInGallery();
+                startDialog();
+                //selectImageInGallery();
             }
         });
         photoButton.setOnClickListener(new View.OnClickListener() {
@@ -225,6 +250,29 @@ public class TensorflowActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tensor_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation_home:
+                Log.d("testdata",cancerResult);
+                /*if (cancerResult.getText() == null || btns[0].getText().toString().equalsIgnoreCase("")) {
+                    TestData.newInstance().setCancerProbability("0");
+                } else if (cancer.getText().toString().contains("%")){
+                    TestData.newInstance().setCancerProbability(btns[0].getText().toString().split("%")[0]);
+                }else {
+                */
+                int probability = Integer.valueOf(cancerResult);
+                TestData.newInstance().setCancerProbability(probability+"");
+                //}
+
+                Intent intent=new Intent(getApplicationContext(), Pain_Dialouge_Activity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setData(List<Float> value, List<String> name) {
@@ -305,7 +353,109 @@ public class TensorflowActivity extends AppCompatActivity {
         }
 
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SELECT_IMAGE && resultCode == Activity.RESULT_OK) {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            bitmap = null;
+            selectedImagePath = null;
+
+            if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
+
+                File f = new File(Environment.getExternalStorageDirectory()
+                        .toString());
+                for (File temp : f.listFiles()) {
+                    if (temp.getName().equals("temp.jpg")) {
+                        f = temp;
+                        break;
+                    }
+                }
+
+                if (!f.exists()) {
+
+                    Toast.makeText(getBaseContext(),
+
+                            "Error while capturing image", Toast.LENGTH_LONG)
+
+                            .show();
+
+                    return;
+
+                }
+
+                try {
+
+
+                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+
+                    int rotate = 0;
+                    try {
+                        ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+                        int orientation = exif.getAttributeInt(
+                                ExifInterface.TAG_ORIENTATION,
+                                ExifInterface.ORIENTATION_NORMAL);
+
+                        switch (orientation) {
+                            case ExifInterface.ORIENTATION_ROTATE_270:
+                                rotate = 270;
+                                break;
+                            case ExifInterface.ORIENTATION_ROTATE_180:
+                                rotate = 180;
+                                break;
+                            case ExifInterface.ORIENTATION_ROTATE_90:
+                                rotate = 90;
+                                break;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(rotate);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                            bitmap.getHeight(), matrix, true);
+
+
+
+                    imageView.setImageBitmap(bitmap);
+                    getCloudData();
+
+                    //storeImageTosdCard(bitmap);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
+                if (data != null) {
+
+                    Uri selectedImage = data.getData();
+                    String[] filePath = { MediaStore.Images.Media.DATA };
+                    Cursor c = getContentResolver().query(selectedImage, filePath,
+                            null, null, null);
+                    c.moveToFirst();
+                    int columnIndex = c.getColumnIndex(filePath[0]);
+                    selectedImagePath = c.getString(columnIndex);
+                    c.close();
+
+                    if (selectedImagePath != null) {
+                        //txt_image_path.setText(selectedImagePath);
+                    }
+
+                    bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
+                    // preview image
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+
+                    imageView.setImageBitmap(bitmap);
+
+                    getCloudData();
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Cancelled",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        /*if (requestCode == REQUEST_SELECT_IMAGE && resultCode == Activity.RESULT_OK) {
             //Bitmap photo = (Bitmap) data.getExtras().get("data");
             Uri imgUri = data.getData();
             Bitmap photo = null;
@@ -347,7 +497,7 @@ public class TensorflowActivity extends AppCompatActivity {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     final Map<String, String> headers = new HashMap<>();
-                    headers.put("Prediction-Key","3f8680d0ce2742fcbe3190a222dc6113");
+                    headers.put("Prediction-Key","e2803d8e0ff54f1cb5715f33522ef3a4");
                     //connection.setRequestProperty("Content-lenght", postData.size.toString())
                     headers.put("Content-Type", "application/octet-stream");
 
@@ -361,8 +511,110 @@ public class TensorflowActivity extends AppCompatActivity {
             // Add the request to the RequestQueue.
             //queue.add(stringRequest);
 
-        }
+        }*/
     }
+
+    private void getCloudData() {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+        byteArray = stream.toByteArray();
+        //photo.recycle();
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v2.0/Prediction/2afe58df-39d2-414c-b9e7-689884095147/image";
+        String requestBody = bitmap.toString();
+        JSONObject jsonBody = new JSONObject();
+
+
+        StringRequest myReq = new StringRequest(Request.Method.POST,
+                url,createMyReqSuccessListener(),
+                createMyReqErrorListener())
+        {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                //String str = "";
+                return byteArray;
+            };
+
+            public String getBodyContentType()
+            {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                headers.put("Prediction-Key","e2803d8e0ff54f1cb5715f33522ef3a4");
+                //connection.setRequestProperty("Content-lenght", postData.size.toString())
+                headers.put("Content-Type", "application/octet-stream");
+
+                //headers.put("Authorization", "Basic " + "c2FnYXJAa2FydHBheS5jb206cnMwM2UxQUp5RnQzNkQ5NDBxbjNmUDgzNVE3STAyNzI=");//put your token here
+                return headers;
+            }
+        };
+        //VolleyApplication.getInstance().addToRequestQueue(jsonOblect);
+        queue.add(myReq);
+
+        // Add the request to the RequestQueue.
+        //queue.add(stringRequest);
+    }
+
+    private void storeImageTosdCard(Bitmap processedBitmap) {
+        try {
+            // TODO Auto-generated method stub
+
+            OutputStream output;
+            // Find the SD Card path
+            File filepath = Environment.getExternalStorageDirectory();
+            // Create a new folder in SD Card
+            File dir = new File(filepath.getAbsolutePath() + "/appName/");
+            dir.mkdirs();
+
+            String imge_name = "appName" + System.currentTimeMillis()
+                    + ".jpg";
+            // Create a name for the saved image
+            File file = new File(dir, imge_name);
+            if (file.exists()) {
+                file.delete();
+                file.createNewFile();
+            } else {
+                file.createNewFile();
+
+            }
+
+            try {
+
+                output = new FileOutputStream(file);
+
+                // Compress into png format image from 0% - 100%
+                processedBitmap
+                        .compress(Bitmap.CompressFormat.PNG, 100, output);
+                output.flush();
+                output.close();
+
+                int file_size = Integer
+                        .parseInt(String.valueOf(file.length() / 1024));
+                System.out.println("size ===>>> " + file_size);
+                System.out.println("file.length() ===>>> " + file.length());
+
+                selectedImagePath = file.getAbsolutePath();
+
+
+
+            }
+
+            catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
     private Response.Listener<String> createMyReqSuccessListener() {
         return new Response.Listener<String>() {
             @Override
@@ -390,10 +642,33 @@ public class TensorflowActivity extends AppCompatActivity {
                             cancerResult=probabilityString;
                         btns[i-1].setText(probabilityString + "%");
                         btns[i+4].setText(diseasetype);
+                        double d = Double.valueOf(df2.format(array.getJSONObject(i).getDouble("probability") * 100));
+                        if (d > 0d) {
+                            graphLabels.add(diseasetype);
+                            graphValues.add((float) d);
+                        }else if (d < 10d) {
+                            graphLabels.add(diseasetype.substring(0,3));
+                            graphValues.add((float) d);
+                        }
+
                         list.add(Integer.valueOf(probabilityString));
                         //points[i-1] = new DataPoint(i+2, Double.valueOf(array.getJSONObject(i).getDouble("probability")));
                         //series.appendData(point,true,100);
                     }
+
+/*                  graphLabels.add("cancer");
+                    graphLabels.add("mastitis");
+                    graphLabels.add("normal");
+                    graphValues.add(20.0f);
+                    graphValues.add(40.0f);
+                    graphValues.add(40.0f);         */
+                    if(chart!=null && chart.getData()!=null) {
+                        chart.getData().clearValues();
+                        chart.clear();
+                        chart.invalidate();
+                    }
+                    setData(graphValues,graphLabels);
+                    //populateGraph();
 
                     DataPoint [] statsArray;
                     if(list.size() > 0) {
@@ -434,6 +709,96 @@ public class TensorflowActivity extends AppCompatActivity {
                 Log.i("data","Ski error connect - "+error);
             }
         };
+    }
+
+
+    private void startDialog() {
+        AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(
+                tensorflowcontext);
+        myAlertDialog.setTitle("Select breast picture");
+        myAlertDialog.setMessage("How do you want to select the picture?");
+
+        myAlertDialog.setPositiveButton("Gallery",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        Intent pictureActionIntent = null;
+
+                        pictureActionIntent = new Intent(
+                                Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(
+                                pictureActionIntent,
+                                GALLERY_PICTURE);
+
+                    }
+                });
+
+        myAlertDialog.setNegativeButton("Camera",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                        StrictMode.setVmPolicy(builder.build());
+                        Intent intent = new Intent(
+                                MediaStore.ACTION_IMAGE_CAPTURE);
+                        File f = new File(android.os.Environment
+                                .getExternalStorageDirectory(), "temp.jpg");
+                        /*intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(f));*/
+                        //intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(f));
+                        //Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".my.package.name.provider", createImageFile());
+
+                        startActivityForResult(intent,
+                                CAMERA_REQUEST);
+
+                    }
+                });
+
+        AlertDialog myAlertDiag=myAlertDialog.create();
+
+        myAlertDiag.show();
+
+        Button bq = myAlertDiag.getButton(DialogInterface.BUTTON_NEGATIVE);
+        bq.setBackgroundColor(Color.YELLOW);
+        bq.setTextColor(Color.WHITE);
+        Button bp = myAlertDiag.getButton(DialogInterface.BUTTON_POSITIVE);
+        bp.setBackgroundColor(Color.GREEN);
+        bp.setTextColor(Color.WHITE);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(20,0,0,0);
+        bp.setLayoutParams(params);
+
+        /*myAlertDiag.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(final DialogInterface dialog) {
+                Button negativeButton = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
+                Button positiveButton = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+                positiveButton.setTextColor(getResources().getColor(R.color.colorSlide_1));
+                negativeButton.setTextColor(getResources().getColor(R.color.colorSlide_1));
+                // this not working because multiplying white background (e.g. Holo Light) has no effect
+                //negativeButton.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
+
+                final Drawable negativeButtonDrawable = getResources().getDrawable(R.drawable.alert_dialog_button_light_red);
+                final Drawable positiveButtonDrawable = getResources().getDrawable(R.drawable.alert_dialog_button_light_red);
+                if (Build.VERSION.SDK_INT >= 16) {
+                    negativeButton.setBackground(negativeButtonDrawable);
+                    positiveButton.setBackground(positiveButtonDrawable);
+                } else {
+                    negativeButton.setBackgroundDrawable(negativeButtonDrawable);
+                    positiveButton.setBackgroundDrawable(positiveButtonDrawable);
+                }
+
+                negativeButton.invalidate();
+                positiveButton.invalidate();
+            }
+        });
+        myAlertDialog.show();*/
+
     }
 
     public void selectImageInGallery() {

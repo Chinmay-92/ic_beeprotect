@@ -4,12 +4,30 @@ import android.os.Bundle;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestData implements Serializable {
     static TestData testdata;
+    private List<TestData> allreports = new ArrayList<>();
+    @com.google.gson.annotations.SerializedName("cancerProbability")
     String cancerProbability = "0";
+
+    @com.google.gson.annotations.SerializedName("temperatureDifference")
     String temperatureDifference = "0";
+
+    @com.google.gson.annotations.SerializedName("createdAt")
+    String createdAt;
+    /**
+     * Item Id
+     */
+    @com.google.gson.annotations.SerializedName("id")
+    private String mId;
+
+    @com.google.gson.annotations.SerializedName("painIntensity")
     String painIntensity = "0";
+
+    @com.google.gson.annotations.SerializedName("response")
     String response;
 
     public static TestData newInstance() {
@@ -18,8 +36,28 @@ public class TestData implements Serializable {
         return testdata;
     }
 
+    public List<TestData> getAllreports() {
+        return allreports;
+    }
+
+    public void setAllreports(List<TestData> allreports) {
+        this.allreports = allreports;
+    }
+
+    public void addreport(TestData testData){
+        this.allreports.add(testData);
+    }
+
     public static void setTestdata(TestData testdata) {
         TestData.testdata = testdata;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getCancerProbability() {

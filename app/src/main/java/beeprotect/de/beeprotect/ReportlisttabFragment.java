@@ -5,21 +5,39 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory;
+import com.rey.material.widget.ListView;
+import com.squareup.okhttp.OkHttpClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import androidx.fragment.app.Fragment;
 import beeprotect.de.beeprotect.utils.AzureMLUtil;
 
-public class ReportlisttabFragment extends Fragment {
-    TextView mlresponse;
-    TextView cancerprob,tempdiff,pain;
+import static beeprotect.de.beeprotect.ReportActivity.mAdapter;
+import static beeprotect.de.beeprotect.ReportActivity.mClient;
+import static beeprotect.de.beeprotect.ReportActivity.mToDoTable;
 
+public class ReportlisttabFragment extends Fragment {
+    ArrayList<ReportDataModel> ReportDataModels;
+    ListView listView;
+    public static ReportAdapter adapter;
+    public static List<TestData> allreports;
     public static ReportlisttabFragment newInstance() {
         ReportlisttabFragment fragment = new ReportlisttabFragment();
         return fragment;
@@ -35,9 +53,61 @@ public class ReportlisttabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_report, container, false);
+        View rootView = inflater.inflate(R.layout.activity_report_list, container, false);
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
 
-        cancerprob = rootView.findViewById(R.id.cancerchances);
+        listView = (ListView)rootView.findViewById(R.id.list);
+
+        ReportDataModels= new ArrayList<>();
+
+        try {
+            // Create the Mobile Service Client instance, using the provided
+            mAdapter = new AzureAdapter(getContext(), R.layout.row_item);
+
+            mToDoTable = mClient.getTable(TestData.class);
+
+            ReportActivity.refreshItemsFromTable();
+
+        }catch (Exception ue){
+            ue.printStackTrace();
+        }
+
+        allreports = TestData.newInstance().getAllreports();
+
+        for (TestData report:allreports) {
+            ReportDataModels.add(new ReportDataModel(report.getCreatedAt(),Double.valueOf(report.getTemperatureDifference()),report.getCancerProbability(),report.getPainIntensity()));
+        }
+
+        /*ReportDataModels.add(new ReportDataModel("7 March, 15:00",10.00d,"50","20"));     //insert date time
+        ReportDataModels.add(new ReportDataModel("2 March, 18:00",20.00d,"20","70"));     //insert date time
+        ReportDataModels.add(new ReportDataModel("3 March, 17:00",30.00d,"10","60"));*/     //insert date time
+
+        adapter= new ReportAdapter(ReportDataModels,getContext());
+
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                ReportDataModel ReportDataModel= ReportDataModels.get(position);
+
+                /*Snackbar.make(view, ReportDataModel.getName()+"\n"+ReportDataModel.getType()+" API: "+ReportDataModel.getVersion_number(), Snackbar.LENGTH_LONG)
+                        .setAction("No action", null).show();*/
+                //Toast.makeText(ReportListActivity.this, ReportDataModel.getName(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(),ReportActivity.class);
+                TestData.newInstance().setTemperatureDifference(ReportDataModel.tempDiff);
+                TestData.newInstance().setCancerProbability(ReportDataModel.tensorflow);
+                TestData.newInstance().setPainIntensity(ReportDataModel.pain);
+                //intent.putExtra("report",ReportDataModel);
+                startActivity(intent);
+            }
+        });
+
+
+
+
+        /*cancerprob = rootView.findViewById(R.id.cancerchances);
         //tempdiff = rootView.findViewById(R.id.tempdifference);
         //pain = rootView.findViewById(R.id.painpercent);
 
@@ -79,6 +149,7 @@ public class ReportlisttabFragment extends Fragment {
             ex.printStackTrace();
             //Log.d("json exception",ex.getMessage());
         }
+        */
         return rootView;
     }
 }
