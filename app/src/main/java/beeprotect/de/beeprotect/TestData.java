@@ -10,30 +10,64 @@ import java.util.List;
 public class TestData implements Serializable {
     static TestData testdata;
     private List<TestData> allreports = new ArrayList<>();
-    @com.google.gson.annotations.SerializedName("cancerProbability")
-    String cancerProbability = "0";
+//    @com.google.gson.annotations.SerializedName("cancerProbability")
+    public String cancerProbability = "0";
 
-    @com.google.gson.annotations.SerializedName("temperatureDifference")
-    String temperatureDifference = "0";
+//    @com.google.gson.annotations.SerializedName("temperatureDifference")
+    public String temperatureDifference = "0";
 
-    @com.google.gson.annotations.SerializedName("createdAt")
-    String createdAt;
+    /*@com.google.gson.annotations.SerializedName("createdAt")
+    String createdAt;*/
     /**
      * Item Id
      */
     @com.google.gson.annotations.SerializedName("id")
-    private String mId;
+    public String id;
 
-    @com.google.gson.annotations.SerializedName("painIntensity")
-    String painIntensity = "0";
+//    @com.google.gson.annotations.SerializedName("painIntensity")
+    public String painIntensity = "0";
 
-    @com.google.gson.annotations.SerializedName("response")
-    String response;
+//    @com.google.gson.annotations.SerializedName("response")
+    public String response;
 
     public static TestData newInstance() {
         if (testdata == null )
             testdata = new TestData();
         return testdata;
+    }
+
+    public TestData(){
+
+    }
+    public TestData(String s, String test, String test1, String s1) {
+        this.cancerProbability = cancerProbability;
+        this.temperatureDifference = temperatureDifference;
+        this.painIntensity = painIntensity;
+        this.response = response;
+    }
+
+    public static TestData getTestdata() {
+        return testdata;
+    }
+
+    public TestData(String cancerProbability, String temperatureDifference, String id, String painIntensity, String response) {
+        this.cancerProbability = cancerProbability;
+        this.temperatureDifference = temperatureDifference;
+        this.id = id;
+        this.painIntensity = painIntensity;
+        this.response = response;
+    }
+
+    public void setTemperatureDifference(String temperatureDifference) {
+        this.temperatureDifference = temperatureDifference;
+    }
+
+    public String getmId() {
+        return id;
+    }
+
+    public void setmId(String mId) {
+        this.id = mId;
     }
 
     public List<TestData> getAllreports() {
@@ -52,13 +86,13 @@ public class TestData implements Serializable {
         TestData.testdata = testdata;
     }
 
-    public String getCreatedAt() {
+    /*public String getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
-    }
+    }*/
 
     public String getCancerProbability() {
         return cancerProbability;
@@ -96,8 +130,10 @@ public class TestData implements Serializable {
     @Override
     public String toString() {
         return "TestData{" +
-                "cancerProbability='" + cancerProbability + '\'' +
+                "allreports=" + allreports +
+                ", cancerProbability='" + cancerProbability + '\'' +
                 ", temperatureDifference='" + temperatureDifference + '\'' +
+                ", id='" + id + '\'' +
                 ", painIntensity='" + painIntensity + '\'' +
                 ", response='" + response + '\'' +
                 '}';

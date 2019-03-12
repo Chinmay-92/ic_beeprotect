@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 import static beeprotect.de.beeprotect.ReportActivity.*;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class BeginFragment extends Fragment {
@@ -23,6 +24,37 @@ public class BeginFragment extends Fragment {
         return fragment;
     }
     Intent intent;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        /*try {
+            // Create the Mobile Service Client instance, using the provided
+            *//*if (mAdapter == null )
+            mAdapter = new AzureAdapter(getContext(), R.layout.row_item);*//*
+
+            if (mClient == null) {
+                mClient = new MobileServiceClient(
+                        "https://beeprotectmobile.azurewebsites.net",
+                        getContext()).withFilter(new ReportActivity.ProgressFilter());
+
+                // Extend timeout from default of 10s to 20s
+                mClient.setAndroidHttpClientFactory(new OkHttpClientFactory() {
+                    @Override
+                    public OkHttpClient createOkHttpClient() {
+                        OkHttpClient client = new OkHttpClient();
+                        client.setReadTimeout(20, TimeUnit.SECONDS);
+                        client.setWriteTimeout(20, TimeUnit.SECONDS);
+                        return client;
+                    }
+                });
+            }
+        }catch (Exception ue){
+            ue.printStackTrace();
+        }*/
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -36,6 +68,8 @@ public class BeginFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+
 
         return rootView;
     }

@@ -33,13 +33,21 @@ import com.microsoft.windowsazure.mobileservices.http.ServiceFilter;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterRequest;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
+import com.microsoft.windowsazure.mobileservices.table.sync.MobileServiceSyncContext;
+import com.microsoft.windowsazure.mobileservices.table.sync.localstore.ColumnDataType;
+import com.microsoft.windowsazure.mobileservices.table.sync.localstore.MobileServiceLocalStoreException;
+import com.microsoft.windowsazure.mobileservices.table.sync.localstore.SQLiteLocalStore;
+import com.microsoft.windowsazure.mobileservices.table.sync.synchandler.SimpleSyncHandler;
 import com.squareup.okhttp.OkHttpClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +60,9 @@ import beeprotect.de.beeprotect.utils.AzureMLUtil;
 
 import static beeprotect.de.beeprotect.ReportlisttabFragment.adapter;
 import static beeprotect.de.beeprotect.ReportlisttabFragment.allreports;
+import static beeprotect.de.beeprotect.ReportlisttabFragment.generateTable;
 import static com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.val;
+import com.microsoft.windowsazure.mobileservices.*;
 
 public class ReportActivity extends AppCompatActivity {
     TextView mlresponse;
@@ -70,7 +80,7 @@ public class ReportActivity extends AppCompatActivity {
      */
     public static MobileServiceClient mClient;
     public static MobileServiceTable<TestData> mToDoTable;
-    public static AzureAdapter mAdapter;
+    //public static AzureAdapter mAdapter;
 
     /**
      * Progress spinner to use for table operations
@@ -81,6 +91,27 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
 
+        try {
+            mClient = new MobileServiceClient(
+                    "https://beeprotectmobile.azurewebsites.net",
+                    this
+            );
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        TestData item = new TestData("12","test","test","test");
+        mClient.getTable(TestData.class).insert(item, new TableOperationCallback<TestData>() {
+            public void onCompleted(TestData entity, Exception exception, ServiceFilterResponse response) {
+                if (exception == null) {
+                    // Insert succeeded
+                    Log.d("success","success");
+                } else {
+                    Log.e("error",exception.getLocalizedMessage());
+                    // Insert failed
+                }
+            }
+        });
         mProgressBar = (ProgressBar) findViewById(R.id.loadingProgressBar);
 
         // Initialize the progress bar
@@ -147,7 +178,7 @@ public class ReportActivity extends AppCompatActivity {
             // Create the Mobile Service Client instance, using the provided
 
             // Mobile Service URL and key
-            mClient = new MobileServiceClient(
+            /*mClient = new MobileServiceClient(
                     "https://beeprotectmobile.azurewebsites.net",
                     this).withFilter(new ProgressFilter());
 
@@ -160,34 +191,97 @@ public class ReportActivity extends AppCompatActivity {
                     client.setWriteTimeout(20, TimeUnit.SECONDS);
                     return client;
                 }
-            });
+            });*/
+
+//            AzureServiceAdapter.Initialize(this);
+
+//            AzureServiceAdapter instance = AzureServiceAdapter.getInstance();
+
+//            mClient = instance.getClient();
 
             // Get the Mobile Service Table instance to use
 
-            mToDoTable = mClient.getTable(TestData.class);
+//            mToDoTable = mClient.getTable(TestData.class);
 
-            addItem();
             // Offline Sync
             //mToDoTable = mClient.getSyncTable("TestData", TestData.class);
 
             //Init local storage
-            //initLocalStore().get();
+//            initLocalStore().get();
 
             //mTextNewToDo = (EditText) findViewById(R.id.textNewToDo);
 
             // Create an adapter to bind the items with the view
-            mAdapter = new AzureAdapter(this, R.layout.row_item);
+            //mAdapter = new AzureAdapter(this, R.layout.row_item);
             //ListView listViewToDo = (ListView) findViewById(R.id.listViewToDo);
             //listViewToDo.setAdapter(mAdapter);
 
             // Load the items from the Mobile Service
-            refreshItemsFromTable();
+            //refreshItemsFromTable();
 
-        } catch (MalformedURLException e) {
-            Toast.makeText(this, ""+(new Exception("There was an error creating the Mobile Service. Verify the URL")), Toast.LENGTH_SHORT).show();
-        } catch (Exception e){
-            Toast.makeText(this, "Error: "+e, Toast.LENGTH_SHORT).show();
+/*            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    //Do something after 100ms
+                    addItem();
+                }
+            }, 2000);*/
+
+
+            //refreshItemsFromTable();
+
+
+            //AzureServiceAdapter.Initialize(this);
+
+            //AzureServiceAdapter instance = AzureServiceAdapter.getInstance();
+
+
+
+        } /*catch (MalformedURLException e) {
+            Log.e("MalformedURL Error: ",e.getLocalizedMessage());
+        } */catch (Exception e){
+            Log.e("Error: ",e.getLocalizedMessage());
         }
+    }
+
+    private AsyncTask<Void, Void, Void> initLocalStore() throws MobileServiceLocalStoreException, ExecutionException, InterruptedException {
+
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+
+                    MobileServiceSyncContext syncContext = mClient.getSyncContext();
+
+                    if (syncContext.isInitialized())
+                        return null;
+
+                    SQLiteLocalStore localStore = new SQLiteLocalStore(mClient.getContext(), "OfflineStore", null, 1);
+
+                    Map<String, ColumnDataType> tableDefinition = new HashMap<String, ColumnDataType>();
+                    tableDefinition.put("id", ColumnDataType.String);
+                    tableDefinition.put("cancerProbability", ColumnDataType.String);
+                    tableDefinition.put("temperatureDifference", ColumnDataType.String);
+                    tableDefinition.put("painIntensity", ColumnDataType.String);
+                    tableDefinition.put("response", ColumnDataType.String);
+                    //tableDefinition.put("createdAt", ColumnDataType.Date);
+
+                    localStore.defineTable("TestData", tableDefinition);
+
+                    SimpleSyncHandler handler = new SimpleSyncHandler();
+
+                    syncContext.initialize(localStore, handler).get();
+
+                } catch (final Exception e) {
+                    Log.e( "Error",e.getLocalizedMessage());
+                }
+
+                return null;
+            }
+        };
+
+        return runAsyncTask(task);
     }
 
     public static class ProgressFilter implements ServiceFilter {
@@ -253,18 +347,23 @@ public class ReportActivity extends AppCompatActivity {
                     UIHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mAdapter.clear();
+                            //mAdapter.clear();
 
                             for (TestData item : results) {
-                                mAdapter.add(item);
+                                //mAdapter.add(item);
                                 if (!TestData.newInstance().getAllreports().contains(item))
                                 {
                                     TestData.newInstance().addreport(item);
-                                    allreports.add(item);
-                                    adapter.notifyDataSetChanged();
+                                    if (!allreports.contains(item)) {
+                                        allreports.add(item);
+                                        if (adapter!=null)
+                                        adapter.notifyDataSetChanged();
+                                    }
                                 }
 
                             }
+                            generateTable();
+
                         }
                     });
                 } catch (final Exception e){
@@ -284,8 +383,7 @@ public class ReportActivity extends AppCompatActivity {
      */
 
     public static List<TestData> refreshItemsFromMobileServiceTable() throws ExecutionException, InterruptedException {
-        return mToDoTable.where().field("complete").
-                eq(val(false)).execute().get();
+        return mToDoTable.select("id","cancerProbability","temperatureDifference","painIntensity","response").execute().get();
     }
 
     public static void addItem() {
@@ -294,6 +392,8 @@ public class ReportActivity extends AppCompatActivity {
         }
 
         // Create a new item
+        String id = "123";
+        //TestData.newInstance().setmId(id);
         final TestData item = TestData.newInstance();
 
         // Insert the new item
@@ -301,24 +401,27 @@ public class ReportActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    final TestData entity = addItemInTable(item);
+                    final TestData testdata = addItemInTable(item);
 
                     UIHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             //if(!entity.isComplete()){
-                                mAdapter.add(entity);
-                                if (!item.getAllreports().contains(entity))
+                                //mAdapter.add(testdata);
+                                //if (!item.getAllreports().contains(testdata))
                                 {
-                                    item.addreport(entity);
-                                    allreports.add(item);
-                                    adapter.notifyDataSetChanged();
+                                    item.addreport(testdata);
+                                    //if (!allreports.contains(item)) {
+                                    //    allreports.add(item);
+                                        /*if (adapter!=null)
+                                            adapter.notifyDataSetChanged();*/
+                                    //}
                                 }
                             //}
                         }
                     });
                 } catch (final Exception e) {
-/*                    Toast.makeText(getApplicationContext(), "Error: "+e, Toast.LENGTH_SHORT).show();*/
+                    Log.e("Error: ",e.getLocalizedMessage());
                 }
                 return null;
             }

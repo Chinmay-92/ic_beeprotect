@@ -29,15 +29,15 @@ import java.util.concurrent.TimeUnit;
 import androidx.fragment.app.Fragment;
 import beeprotect.de.beeprotect.utils.AzureMLUtil;
 
-import static beeprotect.de.beeprotect.ReportActivity.mAdapter;
+//import static beeprotect.de.beeprotect.ReportActivity.mAdapter;
 import static beeprotect.de.beeprotect.ReportActivity.mClient;
 import static beeprotect.de.beeprotect.ReportActivity.mToDoTable;
 
 public class ReportlisttabFragment extends Fragment {
-    ArrayList<ReportDataModel> ReportDataModels;
+    public static ArrayList<ReportDataModel> ReportDataModels = new ArrayList<>();
     ListView listView;
     public static ReportAdapter adapter;
-    public static List<TestData> allreports;
+    public static List<TestData> allreports = new ArrayList<>();
     public static ReportlisttabFragment newInstance() {
         ReportlisttabFragment fragment = new ReportlisttabFragment();
         return fragment;
@@ -59,25 +59,12 @@ public class ReportlisttabFragment extends Fragment {
 
         listView = (ListView)rootView.findViewById(R.id.list);
 
-        ReportDataModels= new ArrayList<>();
 
-        try {
-            // Create the Mobile Service Client instance, using the provided
-            mAdapter = new AzureAdapter(getContext(), R.layout.row_item);
-
+        if (mClient != null ) {
             mToDoTable = mClient.getTable(TestData.class);
-
             ReportActivity.refreshItemsFromTable();
-
-        }catch (Exception ue){
-            ue.printStackTrace();
         }
 
-        allreports = TestData.newInstance().getAllreports();
-
-        for (TestData report:allreports) {
-            ReportDataModels.add(new ReportDataModel(report.getCreatedAt(),Double.valueOf(report.getTemperatureDifference()),report.getCancerProbability(),report.getPainIntensity()));
-        }
 
         /*ReportDataModels.add(new ReportDataModel("7 March, 15:00",10.00d,"50","20"));     //insert date time
         ReportDataModels.add(new ReportDataModel("2 March, 18:00",20.00d,"20","70"));     //insert date time
@@ -151,5 +138,15 @@ public class ReportlisttabFragment extends Fragment {
         }
         */
         return rootView;
+    }
+
+    public static void generateTable() {
+        allreports = TestData.newInstance().getAllreports();
+
+        for (TestData report:allreports) {
+            ReportDataModel model = new ReportDataModel("TEST DATE", Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
+            if (!ReportDataModels.contains(model))
+                ReportDataModels.add(model);
+        }
     }
 }

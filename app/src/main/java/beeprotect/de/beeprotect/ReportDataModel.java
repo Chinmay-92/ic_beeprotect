@@ -2,9 +2,13 @@ package beeprotect.de.beeprotect;
 
 
 import java.io.Serializable;
+import java.util.Objects;
+
+import androidx.annotation.Nullable;
 
 public class ReportDataModel implements Serializable {
 
+    String id;
     String name;
     Double tempDiff;
     String tensorflow;
@@ -15,6 +19,27 @@ public class ReportDataModel implements Serializable {
         this.tempDiff = tempDiff;
         this.tensorflow = tensorflow;
         this.pain = pain;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReportDataModel that = (ReportDataModel) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public void setName(String name) {
