@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TestData implements Serializable {
     static TestData testdata;
-    private List<TestData> allreports = new ArrayList<>();
+    private List<Report> allreports = new ArrayList<>();
 //    @com.google.gson.annotations.SerializedName("cancerProbability")
     public String cancerProbability = "0";
 
@@ -70,15 +70,15 @@ public class TestData implements Serializable {
         this.id = mId;
     }
 
-    public List<TestData> getAllreports() {
+    public List<Report> getAllreports() {
         return allreports;
     }
 
-    public void setAllreports(List<TestData> allreports) {
+    public void setAllreports(List<Report> allreports) {
         this.allreports = allreports;
     }
 
-    public void addreport(TestData testData){
+    public void addreport(Report testData){
         this.allreports.add(testData);
     }
 

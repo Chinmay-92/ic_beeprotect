@@ -2,6 +2,7 @@ package beeprotect.de.beeprotect;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,7 +38,7 @@ public class ReportlisttabFragment extends Fragment {
     public static ArrayList<ReportDataModel> ReportDataModels = new ArrayList<>();
     ListView listView;
     public static ReportAdapter adapter;
-    public static List<TestData> allreports = new ArrayList<>();
+    public static List<Report> allreports = new ArrayList<Report>();
     public static ReportlisttabFragment newInstance() {
         ReportlisttabFragment fragment = new ReportlisttabFragment();
         return fragment;
@@ -66,11 +67,21 @@ public class ReportlisttabFragment extends Fragment {
         }*/
 
 
+
         /*ReportDataModels.add(new ReportDataModel("7 March, 15:00",10.00d,"50","20"));     //insert date time
         ReportDataModels.add(new ReportDataModel("2 March, 18:00",20.00d,"20","70"));     //insert date time
         ReportDataModels.add(new ReportDataModel("3 March, 17:00",30.00d,"10","60"));*/     //insert date time
 
         adapter= new ReportAdapter(ReportDataModels,getContext());
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                generateTable();
+            }
+        }, 2000);
 
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -143,7 +154,7 @@ public class ReportlisttabFragment extends Fragment {
     public static void generateTable() {
         allreports = TestData.newInstance().getAllreports();
 
-        for (TestData report:allreports) {
+        for (Report report:allreports) {
             ReportDataModel model = new ReportDataModel("TEST DATE", Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
             if (!ReportDataModels.contains(model))
                 ReportDataModels.add(model);

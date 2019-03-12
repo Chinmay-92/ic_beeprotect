@@ -29,19 +29,6 @@ public class ReportDataModel implements Serializable {
         this.id = id;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ReportDataModel that = (ReportDataModel) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -74,4 +61,20 @@ public class ReportDataModel implements Serializable {
         return name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReportDataModel that = (ReportDataModel) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(tempDiff, that.tempDiff) &&
+                Objects.equals(tensorflow, that.tensorflow) &&
+                Objects.equals(pain, that.pain);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, tempDiff, tensorflow, pain);
+    }
 }

@@ -34,7 +34,7 @@ public class Pain_Dialouge_Activity extends Activity {
                 TestData.newInstance().setPainIntensity(""+pain);
                 TestData.setTestdata(TestData.testdata);
                 Intent intent=new Intent(getApplicationContext(), ReportActivity.class);
-                intent.putExtra("testData",TestData.testdata);
+                //intent.putExtra("testData",TestData.testdata);
                 startActivity(intent);
                 finish();
             }

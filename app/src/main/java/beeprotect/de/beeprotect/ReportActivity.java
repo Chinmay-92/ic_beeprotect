@@ -1,6 +1,7 @@
 package beeprotect.de.beeprotect;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
@@ -89,7 +90,7 @@ public class ReportActivity extends AppCompatActivity {
     /**
      * Adapter to sync the items list with the view
      */
-    private AzureAdapter mAdapter;
+    public static AzureAdapter mAdapter;
 
     static
     {
@@ -197,7 +198,7 @@ public class ReportActivity extends AppCompatActivity {
             //mToDoTable = mClient.getSyncTable("Report", Report.class);
 
             //Init local storage
-            initLocalStore().get();
+            initLocalStore(getApplicationContext()).get();
 
 
             // Create an adapter to bind the items with the view
@@ -206,7 +207,7 @@ public class ReportActivity extends AppCompatActivity {
             //listViewToDo.setAdapter(mAdapter);
 
             // Load the items from the Mobile Service
-            refreshItemsFromTable();
+            refreshItemsFromTable(getApplicationContext());
 
 
             final Handler handler = new Handler();
@@ -214,14 +215,14 @@ public class ReportActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //Do something after 100ms
-                    addItem(null);
+                    addItem(null,getApplicationContext());
                 }
             }, 2000);
 
         } catch (MalformedURLException e) {
-            createAndShowDialog(new Exception("There was an error creating the Mobile Service. Verify the URL"), "Error");
+            createAndShowDialog(new Exception("There was an error creating the Mobile Service. Verify the URL"), "Error",getApplicationContext());
         } catch (Exception e){
-            createAndShowDialog(e, "Error");
+            createAndShowDialog(e, "Error",getApplicationContext());
         }
     }
 
@@ -231,7 +232,7 @@ public class ReportActivity extends AppCompatActivity {
      * @param view
      *            The view that originated the call
      */
-    public void addItem(View view) {
+    public static void addItem(View view, Context context) {
         if (mClient == null) {
             return;
         }
@@ -253,16 +254,25 @@ public class ReportActivity extends AppCompatActivity {
                 try {
                     final Report entity = addItemInTable(item);
 
-                    runOnUiThread(new Runnable() {
+                    UIHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             if(!entity.isComplete()){
                                 mAdapter.add(entity);
+                                if (!TestData.newInstance().getAllreports().contains(entity))
+                                {
+                                    TestData.newInstance().addreport(entity);
+                                    if (!allreports.contains(item)) {
+                                        allreports.add(item);
+                                        if (adapter!=null)
+                                            adapter.notifyDataSetChanged();
+                                    }
+                                }
                             }
                         }
                     });
                 } catch (final Exception e) {
-                    createAndShowDialogFromTask(e, "Error");
+                    createAndShowDialogFromTask(e, "Error", context);
                 }
                 return null;
             }
@@ -279,7 +289,7 @@ public class ReportActivity extends AppCompatActivity {
      * @param item
      *            The item to Add
      */
-    public Report addItemInTable(Report item) throws ExecutionException, InterruptedException {
+    public static Report addItemInTable(Report item) throws ExecutionException, InterruptedException {
         Report entity = mToDoTable.insert(item).get();
         return entity;
     }
@@ -287,7 +297,7 @@ public class ReportActivity extends AppCompatActivity {
     /**
      * Refresh the list with the items in the Table
      */
-    private void refreshItemsFromTable() {
+    public static void refreshItemsFromTable(Context context) {
 
         // Get the items that weren't marked as completed and add them in the
         // adapter
@@ -302,18 +312,28 @@ public class ReportActivity extends AppCompatActivity {
                     //Offline Sync
                     //final List<Report> results = refreshItemsFromMobileServiceTableSyncTable();
 
-                    runOnUiThread(new Runnable() {
+                    UIHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             mAdapter.clear();
 
                             for (Report item : results) {
                                 mAdapter.add(item);
+                                if (!TestData.newInstance().getAllreports().contains(item))
+                                {
+                                    TestData.newInstance().addreport(item);
+                                    if (!allreports.contains(item)) {
+                                        allreports.add(item);
+                                        Log.d("item pain",item.painIntensity);
+                                        if (adapter!=null)
+                                            adapter.notifyDataSetChanged();
+                                    }
+                                }
                             }
                         }
                     });
                 } catch (final Exception e){
-                    createAndShowDialogFromTask(e, "Error");
+                    createAndShowDialogFromTask(e, "Error",context);
                 }
 
                 return null;
@@ -327,7 +347,7 @@ public class ReportActivity extends AppCompatActivity {
      * Refresh the list with the items in the Mobile Service Table
      */
 
-    private List<Report> refreshItemsFromMobileServiceTable() throws ExecutionException, InterruptedException {
+    public static List<Report> refreshItemsFromMobileServiceTable() throws ExecutionException, InterruptedException {
         return mToDoTable.where().field("complete").
                 eq(val(false)).execute().get();
     }
@@ -351,7 +371,7 @@ public class ReportActivity extends AppCompatActivity {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    private AsyncTask<Void, Void, Void> initLocalStore() throws MobileServiceLocalStoreException, ExecutionException, InterruptedException {
+    public static AsyncTask<Void, Void, Void> initLocalStore(Context context) throws MobileServiceLocalStoreException, ExecutionException, InterruptedException {
 
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -377,7 +397,7 @@ public class ReportActivity extends AppCompatActivity {
                     syncContext.initialize(localStore, handler).get();
 
                 } catch (final Exception e) {
-                    createAndShowDialogFromTask(e, "Error");
+                    createAndShowDialogFromTask(e, "Error", context);
                 }
 
                 return null;
@@ -419,11 +439,11 @@ public class ReportActivity extends AppCompatActivity {
      * @param title
      *            The dialog title
      */
-    private void createAndShowDialogFromTask(final Exception exception, String title) {
-        runOnUiThread(new Runnable() {
+    public static void createAndShowDialogFromTask(final Exception exception, String title, Context context) {
+        UIHandler.post(new Runnable() {
             @Override
             public void run() {
-                createAndShowDialog(exception, "Error");
+                createAndShowDialog(exception, "Error", context);
             }
         });
     }
@@ -437,12 +457,12 @@ public class ReportActivity extends AppCompatActivity {
      * @param title
      *            The dialog title
      */
-    private void createAndShowDialog(Exception exception, String title) {
+    public static void createAndShowDialog(Exception exception, String title, Context context) {
         Throwable ex = exception;
         if(exception.getCause() != null){
             ex = exception.getCause();
         }
-        createAndShowDialog(ex.getMessage(), title);
+        createAndShowDialog(ex.getMessage(), title, context);
     }
 
     /**
@@ -453,8 +473,8 @@ public class ReportActivity extends AppCompatActivity {
      * @param title
      *            The dialog title
      */
-    private void createAndShowDialog(final String message, final String title) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    public static void createAndShowDialog(final String message, final String title, Context context) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         builder.setMessage(message);
         builder.setTitle(title);
@@ -466,7 +486,7 @@ public class ReportActivity extends AppCompatActivity {
      * @param task
      * @return
      */
-    private AsyncTask<Void, Void, Void> runAsyncTask(AsyncTask<Void, Void, Void> task) {
+    public static AsyncTask<Void, Void, Void> runAsyncTask(AsyncTask<Void, Void, Void> task) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {
@@ -474,7 +494,7 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 
-    private class ProgressFilter implements ServiceFilter {
+    public static class ProgressFilter implements ServiceFilter {
 
         @Override
         public ListenableFuture<ServiceFilterResponse> handleRequest(ServiceFilterRequest request, NextServiceFilterCallback nextServiceFilterCallback) {
@@ -482,7 +502,7 @@ public class ReportActivity extends AppCompatActivity {
             final SettableFuture<ServiceFilterResponse> resultFuture = SettableFuture.create();
 
 
-            runOnUiThread(new Runnable() {
+            UIHandler.post(new Runnable() {
 
                 @Override
                 public void run() {
@@ -500,7 +520,7 @@ public class ReportActivity extends AppCompatActivity {
 
                 @Override
                 public void onSuccess(ServiceFilterResponse response) {
-                    runOnUiThread(new Runnable() {
+                    UIHandler.post(new Runnable() {
 
                         @Override
                         public void run() {

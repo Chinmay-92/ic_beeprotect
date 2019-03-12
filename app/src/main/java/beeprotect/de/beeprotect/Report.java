@@ -1,5 +1,7 @@
 package beeprotect.de.beeprotect;
 
+import java.util.Objects;
+
 public class Report {
 
     /**
@@ -14,7 +16,7 @@ public class Report {
      * Item text
      */
     @com.google.gson.annotations.SerializedName("text")
-    private String mText;
+    private String mText = "report";
     /**
      * Item text
      */
@@ -95,6 +97,38 @@ public class Report {
         mId = id;
     }
 
+    public String getCancerProbability() {
+        return cancerProbability;
+    }
+
+    public void setCancerProbability(String cancerProbability) {
+        this.cancerProbability = cancerProbability;
+    }
+
+    public String getTemperatureDifference() {
+        return temperatureDifference;
+    }
+
+    public void setTemperatureDifference(String temperatureDifference) {
+        this.temperatureDifference = temperatureDifference;
+    }
+
+    public String getPainIntensity() {
+        return painIntensity;
+    }
+
+    public void setPainIntensity(String painIntensity) {
+        this.painIntensity = painIntensity;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
     /**
      * Indicates if the item is marked as completed
      */
@@ -111,6 +145,17 @@ public class Report {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Report && ((Report) o).mId == mId;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Report report = (Report) o;
+        return Objects.equals(cancerProbability, report.cancerProbability) &&
+                Objects.equals(temperatureDifference, report.temperatureDifference) &&
+                Objects.equals(painIntensity, report.painIntensity) &&
+                Objects.equals(response, report.response);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cancerProbability, temperatureDifference, painIntensity, response);
     }
 }
