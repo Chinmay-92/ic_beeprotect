@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 
-class AzureAdapter extends ArrayAdapter<TestData> {
+class AzureAdapter extends ArrayAdapter<Report> {
 
     /**
      * Adapter context
@@ -34,7 +34,7 @@ class AzureAdapter extends ArrayAdapter<TestData> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
 
-        final TestData currentItem = getItem(position);
+        final Report currentItem = getItem(position);
 
         if (row == null) {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();

@@ -60,10 +60,10 @@ public class ReportlisttabFragment extends Fragment {
         listView = (ListView)rootView.findViewById(R.id.list);
 
 
-        if (mClient != null ) {
+        /*if (mClient != null ) {
             mToDoTable = mClient.getTable(TestData.class);
             ReportActivity.refreshItemsFromTable();
-        }
+        }*/
 
 
         /*ReportDataModels.add(new ReportDataModel("7 March, 15:00",10.00d,"50","20"));     //insert date time
