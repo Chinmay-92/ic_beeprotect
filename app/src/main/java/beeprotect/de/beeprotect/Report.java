@@ -16,7 +16,7 @@ public class Report {
      * Item text
      */
     @com.google.gson.annotations.SerializedName("text")
-    private String mText = "report";
+    private String mText;
     /**
      * Item text
      */

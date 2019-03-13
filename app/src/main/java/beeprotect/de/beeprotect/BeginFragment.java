@@ -13,9 +13,11 @@ import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import static beeprotect.de.beeprotect.ReportActivity.*;
 import static beeprotect.de.beeprotect.ReportlisttabFragment.ReportDataModels;
+import static beeprotect.de.beeprotect.ReportlisttabFragment.allreports;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -68,6 +70,9 @@ public class BeginFragment extends Fragment {
                 }
             });
 
+            allreports = allreports = TestData.newInstance().getAllreports();
+            if(allreports == null)
+                allreports = new ArrayList<>();
             // Get the Mobile Service Table instance to use
 
             mToDoTable = mClient.getTable(Report.class);
@@ -78,25 +83,17 @@ public class BeginFragment extends Fragment {
             //Init local storage
             initLocalStore(getContext()).get();
 
+            if (ReportlisttabFragment.adapter ==null)
             ReportlisttabFragment.adapter = new ReportAdapter(ReportDataModels,getContext());
 
             // Create an adapter to bind the items with the view
+            if (mAdapter==null)
             mAdapter = new AzureAdapter(getContext(), R.layout.row_item);
             //ListView listViewToDo = (ListView) findViewById(R.id.listViewToDo);
             //listViewToDo.setAdapter(mAdapter);
 
             // Load the items from the Mobile Service
             refreshItemsFromTable(getContext());
-
-
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    //Do something after 100ms
-                    addItem(null,getContext());
-                }
-            }, 2000);
 
         } catch (MalformedURLException e) {
             createAndShowDialog(new Exception("There was an error creating the Mobile Service. Verify the URL"), "Error",getContext());

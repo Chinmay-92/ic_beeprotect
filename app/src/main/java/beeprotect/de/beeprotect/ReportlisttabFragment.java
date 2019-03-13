@@ -33,12 +33,13 @@ import beeprotect.de.beeprotect.utils.AzureMLUtil;
 //import static beeprotect.de.beeprotect.ReportActivity.mAdapter;
 import static beeprotect.de.beeprotect.ReportActivity.mClient;
 import static beeprotect.de.beeprotect.ReportActivity.mToDoTable;
+import static beeprotect.de.beeprotect.ReportActivity.refreshItemsFromTable;
 
 public class ReportlisttabFragment extends Fragment {
     public static ArrayList<ReportDataModel> ReportDataModels = new ArrayList<>();
     ListView listView;
     public static ReportAdapter adapter;
-    public static List<Report> allreports = new ArrayList<Report>();
+    public static List<Report> allreports;
     public static ReportlisttabFragment newInstance() {
         ReportlisttabFragment fragment = new ReportlisttabFragment();
         return fragment;
@@ -66,12 +67,23 @@ public class ReportlisttabFragment extends Fragment {
             ReportActivity.refreshItemsFromTable();
         }*/
 
+        final Handler refreshhandler = new Handler();
+        refreshhandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                if (mClient != null && ReportActivity.mAdapter != null){
+                    refreshItemsFromTable(getContext());
+                }
+            }
+        }, 3000);
 
 
         /*ReportDataModels.add(new ReportDataModel("7 March, 15:00",10.00d,"50","20"));     //insert date time
         ReportDataModels.add(new ReportDataModel("2 March, 18:00",20.00d,"20","70"));     //insert date time
         ReportDataModels.add(new ReportDataModel("3 March, 17:00",30.00d,"10","60"));*/     //insert date time
 
+        if (adapter==null)
         adapter= new ReportAdapter(ReportDataModels,getContext());
 
         final Handler handler = new Handler();

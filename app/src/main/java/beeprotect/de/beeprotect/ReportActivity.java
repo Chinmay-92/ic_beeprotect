@@ -47,6 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,6 +191,9 @@ public class ReportActivity extends AppCompatActivity {
                 }
             });
 
+            allreports = allreports = TestData.newInstance().getAllreports();
+            if(allreports == null)
+                allreports = new ArrayList<>();
             // Get the Mobile Service Table instance to use
 
             mToDoTable = mClient.getTable(Report.class);

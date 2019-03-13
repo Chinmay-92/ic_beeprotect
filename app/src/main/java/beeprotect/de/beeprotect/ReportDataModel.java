@@ -66,8 +66,7 @@ public class ReportDataModel implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ReportDataModel that = (ReportDataModel) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
+        return Objects.equals(name, that.name) &&
                 Objects.equals(tempDiff, that.tempDiff) &&
                 Objects.equals(tensorflow, that.tensorflow) &&
                 Objects.equals(pain, that.pain);
@@ -75,6 +74,6 @@ public class ReportDataModel implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, tempDiff, tensorflow, pain);
+        return Objects.hash(name, tempDiff, tensorflow, pain);
     }
 }
