@@ -1,9 +1,12 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/black">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
@@ -15,12 +18,59 @@
         android:text="Pain Intensity"
         android:textSize="30sp"/>
 
+    <RelativeLayout
+        android:id="@+id/progressbar"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/text2"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:padding="20dp">
+        <ProgressBar
+            android:id="@+id/PROGRESS_BAR"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_centerInParent="true"
+            android:layout_width="80dp"
+            android:layout_height="180dp"
+            android:max="100"
+            android:progress="93"
+            android:progressDrawable="@drawable/progress_drawable" />
+        <TextView
+            android:background="#00000000"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Severe"
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@id/PROGRESS_BAR" />
+
+        <TextView
+            android:background="#00000000"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Mild"
+            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@id/PROGRESS_BAR" />
+
+        <TextView
+            android:background="#00000000"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Medium"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
+<!--            android:layout_alignLeft="@id/PROGRESS_BAR"
+            android:layout_alignTop="@id/PROGRESS_BAR"
+            android:layout_alignRight="@id/PROGRESS_BAR"
+            android:layout_alignBottom="@id/PROGRESS_BAR" />-->
+    </RelativeLayout>
+
     <!-- use Material.Widget.Slider.Discrete style for discrete mode -->
-    <com.rey.material.widget.Slider
+    <!--<com.rey.material.widget.Slider
         style="@style/Material.Widget.Slider"
         android:layout_width="match_parent"
+        android:layout_below="@id/progressbar"
         android:id="@+id/slider1"
-        android:layout_below="@id/text2"
         android:layout_height="wrap_content"
         android:gravity="center"
         app:sl_textColor="@android:color/white"
@@ -29,7 +79,46 @@
         app:sl_discreteMode="true"
         app:sl_minValue="0"
         app:sl_maxValue="100"
-        app:sl_value="50"/>
+        app:sl_value="50"/>-->
+
+    <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+        android:id="@+id/slider1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progressbar"
+        android:gravity="center"
+        app:dsb_min="0"
+        app:dsb_max="100"
+        />
+
+    <!--<com.gc.materialdesign.views.Slider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progressbar"
+        android:id="@+id/slider1"
+        android:gravity="center"
+        app:sl_textColor="@android:color/white"
+        app:sl_primaryColor="@android:color/holo_blue_light"
+        app:sl_trackCap="round"
+        app:sl_discreteMode="true"
+        app:sl_minValue="0"
+        app:sl_maxValue="100"
+        >
+
+    </com.gc.materialdesign.views.Slider>-->
+
+    <GridView
+        android:id="@+id/gridview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="2"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:layout_below="@id/slider1"
+        android:listSelector="@drawable/list_selector"
+        android:scrollbars="none" />
 
     <Button
         android:layout_width="wrap_content"
@@ -37,7 +126,7 @@
         android:text="Submit"
         android:layout_marginBottom="44dp"
         android:textSize="20sp"
-        android:layout_below="@id/slider1"
+        android:layout_below="@id/gridview"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:padding="5dp"
@@ -48,3 +137,4 @@
 <!--    android:layout_below="@id/slider1"-->
 
 </RelativeLayout>
+</ScrollView>

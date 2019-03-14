@@ -100,8 +100,8 @@
 
         <activity
             android:label="Pain Intensity"
-            android:name=".Pain_Dialouge_Activity"
-            android:theme="@android:style/Theme.Material.Dialog" />
+            android:name=".Pain_Dialouge_Activity" />
+            <!--android:theme="@android:style/Theme.Material.Dialog" />-->
 
 
         <provider
