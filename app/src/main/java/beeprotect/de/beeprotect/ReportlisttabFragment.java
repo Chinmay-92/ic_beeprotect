@@ -60,8 +60,7 @@ public class ReportlisttabFragment extends Fragment {
         setSupportActionBar(toolbar);*/
 
         listView = (ListView)rootView.findViewById(R.id.list);
-        TextView emptyText = rootView.findViewById(android.R.id.empty);
-
+        TextView emptyText = rootView.findViewById(R.id.empty);
 
         /*if (mClient != null ) {
             mToDoTable = mClient.getTable(TestData.class);
@@ -85,7 +84,7 @@ public class ReportlisttabFragment extends Fragment {
         ReportDataModels.add(new ReportDataModel("3 March, 17:00",30.00d,"10","60"));*/     //insert date time
 
         if (adapter==null)
-        adapter= new ReportAdapter(ReportDataModels,getContext());
+            adapter= new ReportAdapter(ReportDataModels,getContext());
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -93,6 +92,7 @@ public class ReportlisttabFragment extends Fragment {
             public void run() {
                 //Do something after 100ms
                 generateTable();
+                if (emptyText != null)
                 emptyText.setVisibility(View.GONE);
             }
         }, 2000);
