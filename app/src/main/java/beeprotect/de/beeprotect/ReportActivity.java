@@ -391,6 +391,7 @@ public class ReportActivity extends AppCompatActivity {
                     Map<String, ColumnDataType> tableDefinition = new HashMap<String, ColumnDataType>();
                     tableDefinition.put("id", ColumnDataType.String);
                     tableDefinition.put("text", ColumnDataType.String);
+                    tableDefinition.put("createdAt", ColumnDataType.Date);
                     tableDefinition.put("complete", ColumnDataType.Boolean);
 
                     localStore.defineTable("Reports", tableDefinition);

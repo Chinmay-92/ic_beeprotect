@@ -192,7 +192,7 @@ public class ReportlisttabFragment extends Fragment {
         allreports = TestData.newInstance().getAllreports();
 
         for (Report report:allreports) {
-            ReportDataModel model = new ReportDataModel("TEST DATE", Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
+            ReportDataModel model = new ReportDataModel(report.getCreatedAt(), Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
             if (!ReportDataModels.contains(model)) {
                 ReportDataModels.add(model);
                 adapter.notifyDataSetChanged();

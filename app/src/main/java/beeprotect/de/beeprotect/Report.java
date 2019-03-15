@@ -17,6 +17,9 @@ public class Report {
      */
     @com.google.gson.annotations.SerializedName("text")
     private String mText;
+
+    @com.google.gson.annotations.SerializedName("createdAt")
+    private String mCreatedAt;
     /**
      * Item text
      */
@@ -63,6 +66,14 @@ public class Report {
         this.setId(id);
     }
 
+    public String getCreatedAt() {
+        return mCreatedAt;
+    }
+
+    public final void setCreatedAt(String createdAt) {
+        this.mCreatedAt = createdAt;
+    }
+
     /**
      * Returns the item text
      */
@@ -96,6 +107,7 @@ public class Report {
     public final void setId(String id) {
         mId = id;
     }
+
 
     public String getCancerProbability() {
         return cancerProbability;
