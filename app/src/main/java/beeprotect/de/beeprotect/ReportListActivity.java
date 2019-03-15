@@ -73,9 +73,9 @@ public class ReportListActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.delete) {
+        /*if (id == R.id.delete) {
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

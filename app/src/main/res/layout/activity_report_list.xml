@@ -5,11 +5,24 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ReportListActivity"
+    android:background="@android:color/black"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_main">
+    >
+
+    <TextView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_centerVertical="true"
+        android:text="No reports are available"
+        android:textColor="#FFFFFF" />
 
     <com.rey.material.widget.ListView
         android:id="@+id/list"
+        android:layout_margin="5dp"
+        style="@style/ListViewStyle.Light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />

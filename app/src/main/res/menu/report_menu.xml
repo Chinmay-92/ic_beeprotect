@@ -3,11 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/options"
+        android:id="@+id/refresh"
         android:title="@string/option"
-        app:showAsAction="never" />
-    <item
+        android:icon="@drawable/ic_refresh"
+        app:showAsAction="always" />
+    <!--<item
         android:id="@+id/delete"
         android:title="@string/delete"
-        app:showAsAction="never"/>
+        app:showAsAction="never"/>-->
 </menu>

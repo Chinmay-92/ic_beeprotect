@@ -88,4 +88,9 @@ public class ReportAdapter extends ArrayAdapter<ReportDataModel> implements View
         // Return the completed view to render on screen
         return convertView;
     }
+
+    @Override
+    public int getCount() {
+        return super.getCount();
+    }
 }

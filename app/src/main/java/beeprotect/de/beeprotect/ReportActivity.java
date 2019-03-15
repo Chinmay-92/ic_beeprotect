@@ -169,7 +169,6 @@ public class ReportActivity extends AppCompatActivity {
             Log.d("json exception",je.getMessage());
         }catch (Exception ex){
             ex.printStackTrace();
-            //Log.d("json exception",ex.getMessage());
         }
 
         try {

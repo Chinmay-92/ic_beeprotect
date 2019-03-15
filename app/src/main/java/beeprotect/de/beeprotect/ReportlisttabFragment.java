@@ -7,12 +7,14 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory;
@@ -48,9 +50,7 @@ public class ReportlisttabFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
+        setHasOptionsMenu(true);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,6 +60,7 @@ public class ReportlisttabFragment extends Fragment {
         setSupportActionBar(toolbar);*/
 
         listView = (ListView)rootView.findViewById(R.id.list);
+        TextView emptyText = rootView.findViewById(android.R.id.empty);
 
 
         /*if (mClient != null ) {
@@ -92,10 +93,12 @@ public class ReportlisttabFragment extends Fragment {
             public void run() {
                 //Do something after 100ms
                 generateTable();
+                emptyText.setVisibility(View.GONE);
             }
         }, 2000);
 
         listView.setAdapter(adapter);
+        listView.setEmptyView(emptyText);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -163,13 +166,37 @@ public class ReportlisttabFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.report_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.refresh:
+                refreshItemsFromTable(getContext());
+                if (adapter !=null)
+                    adapter.notifyDataSetChanged();
+                return true;
+            /*case R.id.delete:
+                Toast.makeText(getContext(), "DELETE ALL RECORDS", Toast.LENGTH_SHORT).show();
+                return true;*/
+            default:
+                return true;
+        }
+    }
+
     public static void generateTable() {
         allreports = TestData.newInstance().getAllreports();
 
         for (Report report:allreports) {
             ReportDataModel model = new ReportDataModel("TEST DATE", Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
-            if (!ReportDataModels.contains(model))
+            if (!ReportDataModels.contains(model)) {
                 ReportDataModels.add(model);
+                adapter.notifyDataSetChanged();
+            }
         }
     }
 }

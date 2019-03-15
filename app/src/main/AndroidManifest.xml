@@ -59,7 +59,8 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".ReportActivity">
+        <activity android:name=".ReportActivity"
+            android:label="Report">
 
             <!--
             <intent-filter>
@@ -69,7 +70,8 @@
             </intent-filter>
             -->
         </activity>
-        <activity android:name=".ReportListActivity">
+        <activity android:name=".ReportListActivity"
+            android:label="Reports">
 
             <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -78,6 +80,7 @@
             </intent-filter>-->
         </activity>
         <activity android:name=".TensorflowActivity"
+            android:label="Physical Analysis"
             android:theme="@style/Theme.MaterialComponents.NoActionBar"></activity>
         <activity
             android:name=".HomeActivity"
@@ -88,14 +91,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <activity android:name=".ESPBLE">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
         </activity>
 
         <activity
