@@ -40,6 +40,7 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import at.grabner.circleprogress.CircleProgressView;
 
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
     /*btnOn.setEnabled(false);
     btnOff.setEnabled(false);
     */
+        ActionBar toolbar = getSupportActionBar();
+        toolbar.setBackgroundDrawable(getDrawable(R.color.colorPrimary));
 
         loadingView = findViewById(R.id.loadingView);
         loadingView.setMaxValue(15.00f);
@@ -468,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void changeText() {
-        int delayTime = 20000; // 2 min
+        int delayTime = 50000; // 2 min
         mtext.postDelayed(new Runnable() {
             @Override
             public void run() {

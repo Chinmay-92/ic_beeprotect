@@ -1,5 +1,6 @@
 package beeprotect.de.beeprotect;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         toolbar = getSupportActionBar();
+        toolbar.setBackgroundDrawable(getDrawable(R.color.colorPrimary));
         // load the store fragment by default
         fragment = new TutorialFragment();
 

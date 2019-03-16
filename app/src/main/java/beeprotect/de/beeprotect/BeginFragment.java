@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.http.OkHttpClientFactory;
+import com.skyfishjy.library.RippleBackground;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.net.MalformedURLException;
@@ -33,13 +35,23 @@ public class BeginFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View rootView = inflater.inflate(R.layout.fragment_home_2, container, false);
+
+
+        final RippleBackground rippleBackground=(RippleBackground)rootView.findViewById(R.id.content);
+        ImageView imageView=(ImageView)rootView.findViewById(R.id.centerImage);
+        imageView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+            }
+        });
+        rippleBackground.startRippleAnimation();
 
         intent = new Intent(getActivity(), MainActivity.class);
         final Button button = (Button) rootView.findViewById(R.id.begin);

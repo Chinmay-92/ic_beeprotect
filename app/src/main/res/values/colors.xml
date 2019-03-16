@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#40BAEB</color>
-    <color name="colorPrimaryDark">#723DDB</color>
+    <color name="colorPrimaryDark">#0099CC</color>
     <color name="colorAccent">#9E6179</color>
 
     <color name="breasts">#009888</color>
-    <color name="cancer">#526eff</color>
-    <color name="fibroadenoma">#682cbf</color>
+    <color name="cancer">#0099CC</color>
+    <color name="fibroadenoma">#0099CC</color>
     <color name="gynecomastia">#50342c</color>
     <color name="mastitis">#ff9a00</color>
     <color name="normal">#ffcd00</color>

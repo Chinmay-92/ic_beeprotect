@@ -11,7 +11,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/truiton_image"
         android:layout_centerHorizontal="true"
         android:id="@+id/text2"
         android:textColor="#FFFFFF"
@@ -80,6 +79,14 @@
         app:sl_minValue="0"
         app:sl_maxValue="100"
         app:sl_value="50"/>-->
+
+    <NumberPicker
+        android:id="@+id/np"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progressbar"
+        android:layout_centerHorizontal="true"
+        />
 
     <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
         android:id="@+id/slider1"

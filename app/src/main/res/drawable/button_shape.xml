@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke
+        android:width="1dp"
+        android:color="@color/colorPrimaryDark"/>
+    <corners
+        android:radius="7dp" />
+
+    <padding
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp"
+        android:bottom="1dp"/>
+
+    <solid android:color="#505050"/>
+
+</shape>
+
+<!--
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+&lt;!&ndash; Non focused states &ndash;&gt;
+<item android:state_focused="false" android:state_selected="false" android:state_pressed="false" android:drawable="@drawable/custom_tab_indicator_unselected" />
+<item android:state_focused="false" android:state_selected="true"  android:state_pressed="false" android:drawable="@drawable/custom_tab_indicator_selected" />
+
+&lt;!&ndash; Focused states &ndash;&gt;
+<item android:state_focused="true" android:state_selected="false" android:state_pressed="false" android:drawable="@drawable/custom_tab_indicator_unselected_focused" />
+<item android:state_focused="true" android:state_selected="true"  android:state_pressed="false" android:drawable="@drawable/custom_tab_indicator_selected_focused" />
+
+&lt;!&ndash; Pressed &ndash;&gt;
+&lt;!&ndash;    Non focused states &ndash;&gt;
+<item android:state_focused="false" android:state_selected="false" android:state_pressed="true" android:drawable="@drawable/custom_tab_indicator_unselected_pressed" />
+<item android:state_focused="false" android:state_selected="true"  android:state_pressed="true" android:drawable="@drawable/custom_tab_indicator_selected_pressed" />
+
+&lt;!&ndash;    Focused states &ndash;&gt;
+<item android:state_focused="true" android:state_selected="false" android:state_pressed="true" android:drawable="@drawable/custom_tab_indicator_unselected_pressed" />
+<item android:state_focused="true" android:state_selected="true"  android:state_pressed="true" android:drawable="@drawable/custom_tab_indicator_selected_pressed" />
+</selector>-->

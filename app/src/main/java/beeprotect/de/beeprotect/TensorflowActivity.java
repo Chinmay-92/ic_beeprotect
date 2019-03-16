@@ -75,6 +75,7 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 
@@ -278,6 +279,13 @@ public class TensorflowActivity extends AppCompatActivity {
     private void setData(List<Float> value, List<String> name) {
         ArrayList<PieEntry> entries = new ArrayList<>();
 
+        if(!chart.isEmpty()) {
+            //chart.getData().clearValues();
+            chart.clearValues();
+            chart.clear();
+            chart.invalidate();
+        }
+
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
         //for (int i = 0; i < count ; i++) {
@@ -386,7 +394,7 @@ public class TensorflowActivity extends AppCompatActivity {
 
                     bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
 
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+                    //bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
 
                     int rotate = 0;
                     try {
@@ -443,7 +451,7 @@ public class TensorflowActivity extends AppCompatActivity {
 
                     bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
                     // preview image
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+                    //bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
 
                     imageView.setImageBitmap(bitmap);
 
@@ -523,6 +531,7 @@ public class TensorflowActivity extends AppCompatActivity {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v2.0/Prediction/2afe58df-39d2-414c-b9e7-689884095147/image";
+        //String url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v2.0/Prediction/2afe58df-39d2-414c-b9e7-689884095147/url?iterationId=618516c8-383f-428a-b9ca-122a57560de9/image";
         String requestBody = bitmap.toString();
         JSONObject jsonBody = new JSONObject();
 
@@ -632,7 +641,11 @@ public class TensorflowActivity extends AppCompatActivity {
                     DataPoint[] points = new DataPoint[array.length()];
 
                     List<Integer> list = new ArrayList<>();
-
+                    if(!graphValues.isEmpty()) {
+                        graphValues.clear();
+                        graphLabels.clear();
+                    }
+                    boolean isBreast = false,isNormal = true;
                     for (int i = 1; i < array.length(); i++) {
                         String probabilityString = new DecimalFormat("##").format(Double.valueOf(array.getJSONObject(i).getDouble("probability")) * 100);
                         diseasetype = array.getJSONObject(i).getString("tagName");
@@ -643,12 +656,29 @@ public class TensorflowActivity extends AppCompatActivity {
                         btns[i-1].setText(probabilityString + "%");
                         btns[i+4].setText(diseasetype);
                         double d = Double.valueOf(df2.format(array.getJSONObject(i).getDouble("probability") * 100));
-                        if (d > 0d) {
+                        if( diseasetype.equalsIgnoreCase("notbreasts") && d > 30d ||  diseasetype.equalsIgnoreCase("breasts") && d < 30d ){
+                            isBreast = false;
+                            Toast.makeText(tensorflowcontext, "NOT FOUND", Toast.LENGTH_SHORT).show();
+                            break;
+                        }/*else if( diseasetype.equalsIgnoreCase("breasts") && d < 30d  ){
+                            isBreast = false;
+                            break;
+                        }*/
+                        else {
+                            isBreast = true;
+                        }
+                        if ( diseasetype.equalsIgnoreCase("normal") && d < 30d ){
+                            isNormal = false;
+                            break;
+                        }
+                        if (d < 10d && d>2d) {
+                            graphLabels.add(diseasetype.substring(0,2));
+                            graphValues.add((float) d);
+                        }else if (d > 0d) {
                             graphLabels.add(diseasetype);
                             graphValues.add((float) d);
-                        }else if (d < 10d) {
-                            graphLabels.add(diseasetype.substring(0,3));
-                            graphValues.add((float) d);
+                        }else {
+
                         }
 
                         list.add(Integer.valueOf(probabilityString));
@@ -662,12 +692,18 @@ public class TensorflowActivity extends AppCompatActivity {
                     graphValues.add(20.0f);
                     graphValues.add(40.0f);
                     graphValues.add(40.0f);         */
-                    if(chart!=null && chart.getData()!=null) {
-                        chart.getData().clearValues();
+                    if(!chart.isEmpty()) {
+                        //chart.getData().clearValues();
+                        chart.clearValues();
                         chart.clear();
                         chart.invalidate();
                     }
-                    setData(graphValues,graphLabels);
+                    if (isBreast) {
+                        //if (!isNormal)
+                            setData(graphValues, graphLabels);
+                    }
+                    else
+                        Toast.makeText(tensorflowcontext, "Breast is not detected", Toast.LENGTH_SHORT).show();
                     //populateGraph();
 
                     DataPoint [] statsArray;
@@ -722,13 +758,16 @@ public class TensorflowActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface arg0, int arg1) {
                         Intent pictureActionIntent = null;
-
-                        pictureActionIntent = new Intent(
-                                Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(
-                                pictureActionIntent,
-                                GALLERY_PICTURE);
+                        if (ActivityCompat.checkSelfPermission(TensorflowActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(TensorflowActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, GALLERY_PICTURE);
+                        } else {
+                            pictureActionIntent = new Intent(
+                                    Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivityForResult(
+                                    pictureActionIntent,
+                                    GALLERY_PICTURE);
+                        }
 
                     }
                 });
@@ -738,19 +777,23 @@ public class TensorflowActivity extends AppCompatActivity {
                     public void onClick(DialogInterface arg0, int arg1) {
                         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
                         StrictMode.setVmPolicy(builder.build());
-                        Intent intent = new Intent(
-                                MediaStore.ACTION_IMAGE_CAPTURE);
-                        File f = new File(android.os.Environment
-                                .getExternalStorageDirectory(), "temp.jpg");
-                        /*intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        if (ActivityCompat.checkSelfPermission(TensorflowActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(TensorflowActivity.this, new String[]{Manifest.permission.CAMERA},CAMERA_REQUEST );
+                        } else {
+                            Intent intent = new Intent(
+                                    MediaStore.ACTION_IMAGE_CAPTURE);
+                            File f = new File(android.os.Environment
+                                    .getExternalStorageDirectory(), "temp.jpg");
+                            /*intent.putExtra(MediaStore.EXTRA_OUTPUT,
                                 Uri.fromFile(f));*/
-                        //intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                                Uri.fromFile(f));
-                        //Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".my.package.name.provider", createImageFile());
+                            //intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                    Uri.fromFile(f));
+                            //Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".my.package.name.provider", createImageFile());
 
-                        startActivityForResult(intent,
-                                CAMERA_REQUEST);
+                            startActivityForResult(intent,
+                                    CAMERA_REQUEST);
+                        }
 
                     }
                 });
