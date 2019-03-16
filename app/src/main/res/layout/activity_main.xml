@@ -143,16 +143,30 @@
     </RelativeLayout>
 
     <TextView
+        android:id="@+id/textViewTimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/graphsLayout"
+        android:text="00:00"
+        android:textSize="40sp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+        android:gravity="center_horizontal"
+        android:layout_marginVertical="5dp"
+        android:textStyle="bold"/>
+
+
+    <TextView
         android:id="@+id/waitText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/graphsLayout"
+        android:layout_below="@id/textViewTimer"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:lines="2"
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
-        android:hint="Please connect the sensors and \n wait for the result..."
+        android:hint="Please wear and turn on the device and \n wait for the analysis..."
         android:textSize="20sp"/>
 
     <Button
@@ -163,7 +177,8 @@
         android:layout_centerHorizontal="true"
         android:padding="8dp"
         android:layout_marginTop="20dp"
-        android:text="Next Test"
+        android:text="Proceed"
+        android:shadowColor="@color/colorPrimaryDark"
         android:textColor="#FFFFFF"
         android:background="@drawable/button_background"
         />

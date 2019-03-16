@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -20,19 +21,24 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -43,6 +49,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import at.grabner.circleprogress.CircleProgressView;
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "LEDOnOff";
@@ -75,9 +82,16 @@ public class MainActivity extends AppCompatActivity {
 
     // Insert your bluetooth devices MAC address
     private static String address = "98:D3:51:F5:E1:45";
+    boolean isStarted = false;
 
     CircleProgressView loadingView;
+    ActionBar toolbar;
+    ImageButton searchButton;
+    TextView textViewTimer;
+    Handler tempHandler = new Handler();
 
+    CountDown timer = new CountDown(180000, 1000);
+    Runnable getTemp;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,9 +106,10 @@ public class MainActivity extends AppCompatActivity {
     /*btnOn.setEnabled(false);
     btnOff.setEnabled(false);
     */
-        ActionBar toolbar = getSupportActionBar();
+        toolbar = getSupportActionBar();
         toolbar.setBackgroundDrawable(getDrawable(R.color.colorPrimary));
 
+        textViewTimer = findViewById(R.id.textViewTimer);
         loadingView = findViewById(R.id.loadingView);
         loadingView.setMaxValue(15.00f);
         loadingView.setMinValueAllowed(0.00f);
@@ -129,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 TestData.newInstance().setTemperatureDifference(Math.abs(diff));
                 Log.d("testdata",""+Math.abs(diff));
                 Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
+                TestData.newInstance().setDuration(textViewTimer.getText().toString());
                 Intent intent=new Intent(getApplicationContext(), TensorflowActivity.class);
                 startActivity(intent);
                 finish();
@@ -152,16 +168,19 @@ public class MainActivity extends AppCompatActivity {
         //mockdata();
         //values.add("21");
         boolean failed = false;
-
-        Runnable getTemp = new Runnable() {
+        getTemp = new Runnable() {
             public void run() {
                 //do something
                 try {
                     int bytes = 0;
                     Integer[] arr = null;
                     byte[] buffer = new byte[256];
-                    if (dataInputStream!=null)
+                    if (dataInputStream!=null) {
+                        if(!isStarted)
+                            timer.start();
+                        isStarted = true;
                         bytes = dataInputStream.read(buffer);
+                    }
                     String readMessage = new String(buffer, 0, bytes);
                     String readMessageRight = new String(buffer, 0, bytes);
                     //Log.d("readmessage",readMessage);
@@ -210,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         //if (btSocket!=null)
-        (new Handler()).postDelayed(getTemp, 1000);
+        (tempHandler).postDelayed(getTemp, 1000);
 
         if (values.size() > 0) {
             addEntry();
@@ -243,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
     viewportRight.setMaxY(40);
     viewportRight.setMaxX(4);
     viewportRight.setScalable(true);*/
+
 
     }
 
@@ -454,6 +474,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
+        searchButton = (ImageButton) menu.findItem(R.id.secure_connect_scan).getActionView();
+
         return true;
     }
     @Override
@@ -475,8 +497,37 @@ public class MainActivity extends AppCompatActivity {
         mtext.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mtext.setText("Please remove sensors \n and proceed with the next test");
+                mtext.setText("Heat analysis is completed \n please remove device and proceed");
+                mtext.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+                if (timer!=null)
+                    timer.onFinish();
+                //next.setEnabled(true);
             }
         }, delayTime);
+    }
+
+    public class CountDown extends CountDownTimer {
+
+        public CountDown(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            long ms = millisUntilFinished;
+            String text = String.format("%02d : %02d",
+                    TimeUnit.MILLISECONDS.toMinutes(ms) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(ms)),
+                    TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(ms)));
+            textViewTimer.setText(text);
+        }
+
+        @Override
+        public void onFinish() {
+            loadingView.stopSpinning();
+            if (getTemp != null){
+                tempHandler.removeCallbacks(getTemp);
+            }
+            //textViewTimer.setText("Analysis is completed");
+        }
     }
 }

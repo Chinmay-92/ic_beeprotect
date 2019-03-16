@@ -2,6 +2,8 @@ package beeprotect.de.beeprotect;
 
 import android.os.Bundle;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -16,12 +18,13 @@ public class TestData implements Serializable {
 //    @com.google.gson.annotations.SerializedName("temperatureDifference")
     public String temperatureDifference = "0";
 
+    public String duration = "";
     /*@com.google.gson.annotations.SerializedName("createdAt")
     String createdAt;*/
     /**
      * Item Id
      */
-    @com.google.gson.annotations.SerializedName("id")
+    @SerializedName("id")
     public String id;
 
 //    @com.google.gson.annotations.SerializedName("painIntensity")
@@ -137,5 +140,13 @@ public class TestData implements Serializable {
                 ", painIntensity='" + painIntensity + '\'' +
                 ", response='" + response + '\'' +
                 '}';
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getDuration() {
+        return duration;
     }
 }

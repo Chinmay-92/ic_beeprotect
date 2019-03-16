@@ -29,4 +29,11 @@
             <stroke android:width="5px" android:color="@color/colorPrimary" />
         </shape>
     </item>
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="10dip" />
+            <gradient android:angle="-90" android:startColor="@color/active_dots" android:endColor="@color/active_dots" />
+            <stroke android:width="5px" android:color="@color/active_dots" />
+        </shape>
+    </item>
 </selector>

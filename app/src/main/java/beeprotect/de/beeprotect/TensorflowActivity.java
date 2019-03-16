@@ -137,7 +137,7 @@ public class TensorflowActivity extends AppCompatActivity {
         chart.setDragDecelerationFrictionCoef(0.95f);
 
         //chart.setCenterTextTypeface(tfLight);
-        chart.setCenterText("Tensorflow results");
+        chart.setCenterText("Results");
 
         chart.setDrawHoleEnabled(true);
         chart.setHoleColor(Color.WHITE);
@@ -224,8 +224,8 @@ public class TensorflowActivity extends AppCompatActivity {
                     TestData.newInstance().setCancerProbability(btns[0].getText().toString().split("%")[0]);
                 }else {
                 */
-                    int probability = Integer.valueOf(cancerResult);
-                    TestData.newInstance().setCancerProbability(probability+"");
+                    //int probability = Integer.valueOf(cancerResult);
+                    TestData.newInstance().setCancerProbability(cancerResult+"%");
                 //}
 
                 Intent intent=new Intent(getApplicationContext(), Pain_Dialouge_Activity.class);
@@ -647,7 +647,7 @@ public class TensorflowActivity extends AppCompatActivity {
                     }
                     boolean isBreast = false,isNormal = true;
                     for (int i = 1; i < array.length(); i++) {
-                        String probabilityString = new DecimalFormat("##").format(Double.valueOf(array.getJSONObject(i).getDouble("probability")) * 100);
+                        String probabilityString = new DecimalFormat("##").format(Double.valueOf(array.getJSONObject(i).getDouble("probability")) );
                         diseasetype = array.getJSONObject(i).getString("tagName");
                         Log.d("probability",probabilityString);
                         Log.d("type",diseasetype);
@@ -655,10 +655,10 @@ public class TensorflowActivity extends AppCompatActivity {
                             cancerResult=probabilityString;
                         btns[i-1].setText(probabilityString + "%");
                         btns[i+4].setText(diseasetype);
-                        double d = Double.valueOf(df2.format(array.getJSONObject(i).getDouble("probability") * 100));
-                        if( diseasetype.equalsIgnoreCase("notbreasts") && d > 30d ||  diseasetype.equalsIgnoreCase("breasts") && d < 30d ){
+                        double d = Double.valueOf(df2.format(array.getJSONObject(i).getDouble("probability") ));
+                        if( diseasetype.equalsIgnoreCase("notbreasts") && d > 10d ||  diseasetype.equalsIgnoreCase("breasts") && d < 30d ){
                             isBreast = false;
-                            Toast.makeText(tensorflowcontext, "NOT FOUND", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(tensorflowcontext, "BREAST NOT FOUND", Toast.LENGTH_SHORT).show();
                             break;
                         }/*else if( diseasetype.equalsIgnoreCase("breasts") && d < 30d  ){
                             isBreast = false;
@@ -671,14 +671,14 @@ public class TensorflowActivity extends AppCompatActivity {
                             isNormal = false;
                             break;
                         }
-                        if (d < 10d && d>2d) {
+                        if (d < 10d && d > 0d) {
                             graphLabels.add(diseasetype.substring(0,2));
                             graphValues.add((float) d);
-                        }else if (d > 0d) {
+                        }else if (d > 10d) {
                             graphLabels.add(diseasetype);
                             graphValues.add((float) d);
                         }else {
-
+                            break;
                         }
 
                         list.add(Integer.valueOf(probabilityString));

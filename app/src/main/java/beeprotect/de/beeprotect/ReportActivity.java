@@ -60,6 +60,7 @@ import androidx.transition.ChangeBounds;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 import beeprotect.de.beeprotect.utils.AzureMLUtil;
+import me.itangqi.waveloadingview.WaveLoadingView;
 
 import static beeprotect.de.beeprotect.ReportlisttabFragment.adapter;
 import static beeprotect.de.beeprotect.ReportlisttabFragment.allreports;
@@ -69,7 +70,9 @@ import com.microsoft.windowsazure.mobileservices.*;
 
 public class ReportActivity extends AppCompatActivity {
     TextView mlresponse;
-    TextView cancerprob,tempdiff,pain;
+    TextView tempdiff;
+    TextView duration;
+    WaveLoadingView waveLoadingCancer, waveLoadingPain;
 
     public static Handler UIHandler;
     /**
@@ -109,16 +112,26 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
 
-
+        duration = findViewById(R.id.duration);
         mProgressBar = (ProgressBar) findViewById(R.id.loadingProgressBar);
-
         // Initialize the progress bar
         mProgressBar.setVisibility(ProgressBar.GONE);
 
-        cancerprob = findViewById(R.id.cancerchances);
+        /*cancerprob = findViewById(R.id.cancerchances);
+        tempdiff = findViewById(R.id.tempdifference);*/
+        //pain = findViewById(R.id.painpercent);
         tempdiff = findViewById(R.id.tempdifference);
-        pain = findViewById(R.id.painpercent);
 
+        waveLoadingCancer = (WaveLoadingView)findViewById(R.id.waveLoadingCancer);
+        //waveLoadingCancer.setProgressValue(75);
+        waveLoadingCancer.setBottomTitle("");
+        //waveLoadingCancer.setCenterTitle(String.format("%d%%",75));
+        waveLoadingCancer.setTopTitle("");
+        waveLoadingPain = (WaveLoadingView)findViewById(R.id.waveLoadingPain);
+        //waveLoadingPain.setProgressValue(25);
+        waveLoadingPain.setBottomTitle("");
+        //waveLoadingPain.setCenterTitle(String.format("%d%%",25));
+        waveLoadingPain.setTopTitle("");
 
         Button exit = findViewById(R.id.exit);
         /*final ViewGroup transitionsContainer = (ViewGroup) findViewById(R.id.reportLayout);
@@ -149,9 +162,13 @@ public class ReportActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         Log.d("testdata",TestData.newInstance().toString());
-        cancerprob.setText(TestData.newInstance().getCancerProbability());
+        waveLoadingPain.setCenterTitle(String.format("%d%%",Integer.parseInt(TestData.newInstance().getPainIntensity())));
+        waveLoadingPain.setProgressValue(Integer.parseInt(TestData.newInstance().getPainIntensity()));
+
+        waveLoadingCancer.setCenterTitle(String.format("%d%%",Integer.parseInt(TestData.newInstance().getCancerProbability())));
+        waveLoadingCancer.setProgressValue(Integer.parseInt(TestData.newInstance().getCancerProbability()));
         tempdiff.setText(""+TestData.newInstance().getTemperatureDifference());
-        pain.setText(TestData.newInstance().getPainIntensity());
+        duration.setText(TestData.newInstance().getDuration());
 
         //JSONObject body = new JSONObject();
         try {

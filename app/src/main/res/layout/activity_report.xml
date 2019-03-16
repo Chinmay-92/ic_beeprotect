@@ -1,29 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/reportLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
     tools:context=".ReportActivity">
-
-    <!--<com.google.android.material.card.MaterialCardView
-        android:id="@+id/card"
-        style="@style/Widget.MaterialComponents.CardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/mtrl_card_spacing"
-        android:layout_marginTop="@dimen/mtrl_card_spacing"
-        android:layout_marginRight="@dimen/mtrl_card_spacing"
-        android:minHeight="200dp">
-
-        &lt;!&ndash; Card contents. &ndash;&gt;
-
-    </com.google.android.material.card.MaterialCardView>-->
-<!--    android:layout_below="@id/card"-->
-
-
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
@@ -34,7 +16,6 @@
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="32sp"/>
-
     <TextView
         android:id="@+id/mlresponse"
         android:layout_below="@id/title"
@@ -48,93 +29,100 @@
         android:textStyle="bold|italic"
         android:gravity="center_horizontal"
         android:hint="Instruction"/>
-
     <ProgressBar
         android:id="@+id/loadingProgressBar"
         android:layout_width="28dp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@id/durationcard"
+        android:layout_centerHorizontal="true"
         android:layout_height="28dp" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card"
+    <TextView
+        android:id="@+id/title_cancer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/mlresponse"
-        style="@style/Widget.MaterialComponents.CardView"
+        android:gravity="left"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="@dimen/mtrl_card_spacing"
+        android:layout_marginRight="@dimen/mtrl_card_spacing"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:text="Cancer Probability"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
+    <TextView
+        android:id="@+id/title_pain_intensity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/mlresponse"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="@dimen/mtrl_card_spacing"
+        android:layout_marginRight="@dimen/mtrl_card_spacing"
+        android:layout_toRightOf="@id/title_cancer"
+        android:gravity="right"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:text="Pain Meter"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
+    <me.itangqi.waveloadingview.WaveLoadingView
+        android:id="@+id/waveLoadingCancer"
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:layout_marginLeft="18dp"
         android:layout_marginTop="@dimen/mtrl_card_spacing"
         android:layout_marginRight="@dimen/mtrl_card_spacing"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="5dp"
-        app:cardBackgroundColor="@color/colorPrimaryDark"
-        android:minHeight="200dp">
-
-        <TextView
-            android:id="@+id/cancerchancesLabel"
-            android:layout_marginTop="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="Cancer probability"
-            android:layout_gravity="center_horizontal"
-            android:textSize="22sp"/>
-
-        <TextView
-            android:id="@+id/cancerchances"
-            android:layout_width="wrap_content"
-            android:text="__ %"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:textSize="42sp"/>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/tempcard"
-        android:layout_toRightOf="@id/card"
-        android:layout_below="@id/mlresponse"
-        style="@style/Widget.MaterialComponents.CardView"
+        app:wlv_borderColor="@color/colorAccent"
+        android:layout_below="@id/title_cancer"
+        app:wlv_borderWidth="3dp"
+        app:wlv_shapeType="circle"
+        app:wlv_round_rectangle="true"
+        app:wlv_triangle_direction="north"
+        app:wlv_titleCenterStrokeColor="@color/colorPrimary"
+        app:wlv_titleCenterStrokeWidth="3dp"
+        app:wlv_titleCenterColor="@color/colorSlide_1"
+        app:wlv_titleCenterSize="35sp"
+        app:wlv_titleTopStrokeColor="@color/colorPrimary"
+        app:wlv_titleTopStrokeWidth="3dp"
+        app:wlv_titleTopColor="@color/colorSlide_1"
+        app:wlv_titleTopSize="35sp"
+        app:wlv_titleBottomStrokeColor="@color/colorPrimary"
+        app:wlv_titleBottomStrokeWidth="3dp"
+        app:wlv_titleBottomColor="@color/colorSlide_1"
+        app:wlv_titleBottomSize="35sp"
+        app:wlv_waveAmplitude="70"
+        app:wlv_waveColor="@color/colorAccent" />
+    <me.itangqi.waveloadingview.WaveLoadingView
+        android:id="@+id/waveLoadingPain"
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:layout_marginLeft="@dimen/mtrl_card_spacing"
         android:layout_marginTop="@dimen/mtrl_card_spacing"
         android:layout_marginRight="@dimen/mtrl_card_spacing"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="5dp"
-        app:cardBackgroundColor="@color/colorAccent"
-        android:minHeight="200dp">
-
-        <TextView
-            android:id="@+id/tempdifferenceLabel"
-            android:layout_marginTop="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="Breasts temp difference"
-            android:layout_gravity="center_horizontal"
-            android:textSize="22sp"/>
-
-        <TextView
-            android:id="@+id/tempdifference"
-            android:layout_width="wrap_content"
-            android:text="_.__"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:textSize="42sp"/>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <View
-        android:id="@+id/carddivider"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginHorizontal="5dp"
-        android:layout_below="@id/card"
-        android:background="@android:color/darker_gray"/>
-
+        android:layout_toRightOf="@id/waveLoadingCancer"
+        android:layout_below="@id/title_cancer"
+        app:wlv_borderColor="@color/colorAccent"
+        app:wlv_borderWidth="3dp"
+        app:wlv_shapeType="circle"
+        app:wlv_round_rectangle="true"
+        app:wlv_triangle_direction="north"
+        app:wlv_titleCenterStrokeColor="@color/colorPrimary"
+        app:wlv_titleCenterStrokeWidth="3dp"
+        app:wlv_titleCenterColor="@color/colorSlide_1"
+        app:wlv_titleCenterSize="35sp"
+        app:wlv_titleTopStrokeColor="@color/colorPrimary"
+        app:wlv_titleTopStrokeWidth="3dp"
+        app:wlv_titleTopColor="@color/colorSlide_1"
+        app:wlv_titleTopSize="35sp"
+        app:wlv_titleBottomStrokeColor="@color/colorPrimary"
+        app:wlv_titleBottomStrokeWidth="3dp"
+        app:wlv_titleBottomColor="@color/colorSlide_1"
+        app:wlv_titleBottomSize="35sp"
+        app:wlv_waveAmplitude="70"
+        app:wlv_waveColor="@color/colorAccent" />
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/paincard"
-        android:layout_below="@id/carddivider"
+        android:layout_below="@id/waveLoadingPain"
         app:cardCornerRadius="6dp"
         app:cardElevation="5dp"
         style="@style/Widget.MaterialComponents.CardView"
@@ -145,31 +133,27 @@
         android:layout_marginRight="@dimen/mtrl_card_spacing"
         app:cardBackgroundColor="#BE4C4C"
         android:minHeight="200dp">
-
         <TextView
-            android:id="@+id/painpercentLabel"
+            android:id="@+id/tempdifferenceLabel"
             android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pain meter"
+            android:text="Breast Temp. Difference"
             android:gravity="center_horizontal"
             android:layout_gravity="center_horizontal"
             android:textSize="22sp"/>
-
         <TextView
-            android:id="@+id/painpercent"
+            android:id="@+id/tempdifference"
             android:layout_width="wrap_content"
-            android:text="__ %"
+            android:text="_._"
             android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:textSize="42sp"/>
-
     </com.google.android.material.card.MaterialCardView>
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/durationcard"
         android:layout_toRightOf="@id/paincard"
-        android:layout_below="@id/carddivider"
+        android:layout_below="@id/waveLoadingPain"
         style="@style/Widget.MaterialComponents.CardView"
         android:layout_width="180dp"
         android:layout_height="180dp"
@@ -180,7 +164,6 @@
         app:cardElevation="5dp"
         app:cardBackgroundColor="#8BC34A"
         android:minHeight="200dp">
-
         <TextView
             android:id="@+id/durationLabel"
             android:layout_marginTop="5dp"
@@ -190,7 +173,6 @@
             android:text="Time elapsed"
             android:layout_gravity="center_horizontal"
             android:textSize="22sp"/>
-
         <TextView
             android:id="@+id/duration"
             android:layout_width="wrap_content"
@@ -198,83 +180,20 @@
             android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:textSize="30sp"/>
-
     </com.google.android.material.card.MaterialCardView>
-
-    <View
-        android:id="@+id/paincarddivider"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginHorizontal="5dp"
-        android:layout_below="@id/paincard"
-        android:background="@android:color/darker_gray"/>
-
-    <!--<RelativeLayout
-        android:id="@+id/report"
-        android:layout_margin="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <TextView
-            android:id="@+id/tempdifferenceLabel"
-            android:layout_below="@id/cancerchances"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:gravity="center_horizontal"
-            android:text="Breasts temp difference"
-            android:textSize="22sp"/>
-
-        <TextView
-            android:id="@+id/tempdifference"
-            android:layout_toRightOf="@id/tempdifferenceLabel"
-            android:layout_below="@id/cancerchances"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center_horizontal"
-            android:textSize="22sp"/>
-
-        <TextView
-            android:id="@+id/painpercentLabel"
-            android:layout_below="@id/tempdifference"
-            android:layout_width="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Pain meter"
-            android:layout_height="wrap_content"
-            android:textSize="22sp"/>
-
-        <TextView
-            android:id="@+id/painpercent"
-            android:layout_toRightOf="@id/painpercentLabel"
-            android:layout_below="@id/tempdifference"
-            android:layout_width="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_height="wrap_content"
-            android:textSize="22sp"/>
-
-    </RelativeLayout>-->
-
     <Button
         android:id="@+id/exit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:text="Close"
         android:textAllCaps="false"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_below="@id/paincard"
+        android:layout_below="@id/loadingProgressBar"
         android:layout_centerHorizontal="true"/>
-<!--    style="@style/Widget.AppCompat.Button.Colored"-->
-
-
+    <!-- <SeekBar
+        android:id="@+id/seekBar"
+        android:max="100"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />  -->
 </RelativeLayout>
-
-
-

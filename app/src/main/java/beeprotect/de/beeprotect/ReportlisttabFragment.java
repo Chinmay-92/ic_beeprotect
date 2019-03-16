@@ -25,7 +25,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -192,7 +195,16 @@ public class ReportlisttabFragment extends Fragment {
         allreports = TestData.newInstance().getAllreports();
 
         for (Report report:allreports) {
-            ReportDataModel model = new ReportDataModel(report.getCreatedAt(), Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
+            String createdDate = report.getCreatedAt();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
+            try {
+                Date d = sdf.parse(createdDate);
+                sdf.applyPattern("dd MMM yyyy hh:mm");
+                createdDate = sdf.format(d);
+            } catch (ParseException ex) {
+                Log.v("Exception", ex.getLocalizedMessage());
+            }
+            ReportDataModel model = new ReportDataModel(createdDate, Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
             if (!ReportDataModels.contains(model)) {
                 ReportDataModels.add(model);
                 adapter.notifyDataSetChanged();
