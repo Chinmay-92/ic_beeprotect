@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     TextView textViewTimer;
     Handler tempHandler = new Handler();
 
-    CountDown timer = new CountDown(180000, 1000);
+    CountDown timer = new CountDown(300000, 1000);
     Runnable getTemp;
     /** Called when the activity is first created. */
     @Override
@@ -134,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
         //animate();
 
-        changeText(); // timer for the text below
+        //TODO commented out
+        //changeText(); // timer for the text below
         next = findViewById(R.id.temptotensor);
 
         next.setOnClickListener(new View.OnClickListener() {
@@ -176,8 +177,10 @@ public class MainActivity extends AppCompatActivity {
                     Integer[] arr = null;
                     byte[] buffer = new byte[256];
                     if (dataInputStream!=null) {
-                        if(!isStarted)
+                        if(!isStarted) {
                             timer.start();
+                            changeText(); // timer for the text below
+                        }
                         isStarted = true;
                         bytes = dataInputStream.read(buffer);
                     }
@@ -236,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
         }
         graph.getLegendRenderer().setVisible(true);
         series.setTitle("Left sensor");
+        series.setBackgroundColor(android.R.color.darker_gray);
         graph.addSeries(series);
 
         if (valuesRight.size() > 0) {
@@ -250,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
         graph.getSecondScale().addSeries(seriesRight);
         seriesRight.setTitle("Right sensor");
+        seriesRight.setBackgroundColor(android.R.color.darker_gray);
         seriesRight.setColor(Color.RED);
         graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.RED);
         graph.getSecondScale().setMinY(15);
@@ -493,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void changeText() {
-        int delayTime = 50000; // 2 min
+        int delayTime = 100000; // 2 min
         mtext.postDelayed(new Runnable() {
             @Override
             public void run() {
