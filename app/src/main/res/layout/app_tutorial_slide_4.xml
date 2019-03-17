@@ -21,7 +21,7 @@
         android:gravity="center_horizontal"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:text="Get your report based on previous tests"
+        android:text="Get your report based on previous parameters"
         android:textSize="30sp"
         android:textColor="#000000"/>
 </RelativeLayout>

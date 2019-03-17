@@ -5,5 +5,5 @@
 
     <size android:height="8dp"
         android:width="8dp"/>
-    <solid android:color="@color/active_dots"/>
+    <solid android:color="@android:color/white"/>
     ></shape>

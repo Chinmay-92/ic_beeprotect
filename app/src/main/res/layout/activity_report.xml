@@ -145,7 +145,7 @@
             android:text="_._"
             android:layout_gravity="center"
             android:layout_height="wrap_content"
-            android:textSize="42sp"/>
+            android:textSize="30sp"/>
     </com.google.android.material.card.MaterialCardView>
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/durationcard"

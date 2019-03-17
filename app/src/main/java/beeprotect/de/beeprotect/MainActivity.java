@@ -4,8 +4,10 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.AbstractQueue;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -145,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
                 TestData.newInstance().setTemperatureDifference(Math.abs(diff));
                 Log.d("testdata",""+Math.abs(diff));
                 //Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
-                TestData.newInstance().setDuration(textViewTimer.getText().toString());
+                String remainingTime = getRemainingTime(textViewTimer.getText().toString().trim());
+                TestData.newInstance().setDuration(remainingTime);
                 Intent intent=new Intent(getApplicationContext(), TensorflowActivity.class);
                 startActivity(intent);
                 finish();
@@ -287,6 +290,32 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
+    public String getRemainingTime(String current)
+    {
+        int min = 5;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+        String remtime="NA";
+        try
+        {
+            Date currentTime = simpleDateFormat.parse(current);
+            Date stopTime = simpleDateFormat.parse("05:00");
+            long remainingTime = stopTime.getTime() - currentTime.getTime();
+            /*int days = (int) (remainingTime/ (1000 * 60 * 60 * 24));
+            int hours = (int) ((remainingTime - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
+            min = (int) (remainingTime)
+                    / (1000 * 60);*/
+            remtime = String.format("%02d : %02d",
+                    TimeUnit.MILLISECONDS.toMinutes(remainingTime),
+                    TimeUnit.MILLISECONDS.toSeconds(remainingTime) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(remainingTime))
+            );
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return remtime;
+    }
 
     @Override
     protected void onResume() {
@@ -520,7 +549,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTick(long millisUntilFinished) {
             long ms = millisUntilFinished;
-            String text = String.format("%02d : %02d",
+            String text = String.format("%02d:%02d",
                     TimeUnit.MILLISECONDS.toMinutes(ms) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(ms)),
                     TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(ms)));
             textViewTimer.setText(text);

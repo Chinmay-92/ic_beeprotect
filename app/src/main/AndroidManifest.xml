@@ -71,7 +71,7 @@
             -->
         </activity>
         <activity android:name=".ReportListActivity"
-            >
+            android:theme="@style/Theme.MaterialComponents.NoActionBar">
 
             <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
