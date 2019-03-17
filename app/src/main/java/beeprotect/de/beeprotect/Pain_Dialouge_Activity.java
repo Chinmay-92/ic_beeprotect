@@ -43,6 +43,12 @@ public class Pain_Dialouge_Activity extends Activity {
             R.drawable.femalebody_rightbottom,
             R.drawable.femalebody_rightop
     };
+    boolean[] selectedParts = {
+        false,
+        false,
+        false,
+        false
+    };
     Activity dialogContext;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +69,15 @@ public class Pain_Dialouge_Activity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                Toast.makeText(getApplicationContext(), "You Clicked at " +web[+ position], Toast.LENGTH_SHORT).show();
+                if (!selectedParts[position])
+                    view.setBackground(getResources().getDrawable(R.drawable.hightlight_image));
+                else
+                    view.setBackground(null);
+                if(selectedParts[position])
+                    selectedParts[position] = false;
+                else
+                    selectedParts[position] = true;
+
             }
         });
         /*ListAdapter bodyimagesAdapter = new ArrayAdapter<Drawable>();

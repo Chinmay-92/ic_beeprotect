@@ -130,7 +130,7 @@ public class TensorflowActivity extends AppCompatActivity {
         graph.getViewport().setXAxisBoundsManual(false);*/
 
         chart = findViewById(R.id.chart1);
-        chart.setUsePercentValues(true);
+        chart.setUsePercentValues(false);
         chart.getDescription().setEnabled(false);
         chart.setExtraOffsets(3, 7, 3, 2);
 
@@ -647,19 +647,19 @@ public class TensorflowActivity extends AppCompatActivity {
                     }
                     boolean isBreast = false,isNormal = true;
                     for (int i = 1; i < array.length(); i++) {
-                        String probabilityString = new DecimalFormat("##").format(Double.valueOf(array.getJSONObject(i).getDouble("probability")) );
+                        String probabilityString = new DecimalFormat("##").format(Double.valueOf(array.getJSONObject(i).getDouble("probability")*100) );
                         diseasetype = array.getJSONObject(i).getString("tagName");
                         Log.d("probability",probabilityString);
                         Log.d("type",diseasetype);
                         if (diseasetype.equalsIgnoreCase("cancer"))
                             cancerResult=probabilityString;
-                        btns[i-1].setText(probabilityString + "%");
-                        btns[i+4].setText(diseasetype);
-                        double d = Double.valueOf(df2.format(array.getJSONObject(i).getDouble("probability") ));
+                        //btns[i-1].setText(probabilityString + "%");
+                        //btns[i+4].setText(diseasetype);
+                        double d = Double.valueOf(df2.format(array.getJSONObject(i).getDouble("probability") * 100 ));
                         if( diseasetype.equalsIgnoreCase("notbreasts") && d > 10d ||  diseasetype.equalsIgnoreCase("breasts") && d < 30d ){
                             isBreast = false;
                             //Toast.makeText(tensorflowcontext, "BREAST NOT FOUND", Toast.LENGTH_SHORT).show();
-                            break;
+                            //break;
                         }/*else if( diseasetype.equalsIgnoreCase("breasts") && d < 30d  ){
                             isBreast = false;
                             break;
@@ -671,14 +671,14 @@ public class TensorflowActivity extends AppCompatActivity {
                             isNormal = false;
                             break;
                         }
-                        if (d < 10d && d > 0d) {
+                        if (d < 10d && d > 3d) {
                             graphLabels.add(diseasetype.substring(0,2));
                             graphValues.add((float) d);
                         }else if (d > 10d) {
                             graphLabels.add(diseasetype);
                             graphValues.add((float) d);
                         }else {
-                            break;
+                            //break;
                         }
 
                         list.add(Integer.valueOf(probabilityString));
@@ -699,8 +699,8 @@ public class TensorflowActivity extends AppCompatActivity {
                         chart.invalidate();
                     }
                     if (isBreast) {
-                        //if (!isNormal)
-                            setData(graphValues, graphLabels);
+//                    if(true){    //if (!isNormal)
+                        setData(graphValues, graphLabels);
                     }
                     else
                         Toast.makeText(tensorflowcontext, "Breast is not detected", Toast.LENGTH_SHORT).show();

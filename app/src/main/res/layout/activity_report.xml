@@ -22,19 +22,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        style="@style/TextAppearance.MaterialComponents.Chip"
         android:layout_marginTop="20dp"
         android:textSize="28sp"
-        android:textColor="@android:color/holo_green_dark"
+        android:textColor="@color/colorPrimaryDark"
         android:background="@drawable/bordertextview"
-        android:textStyle="bold|italic"
         android:gravity="center_horizontal"
         android:hint="Instruction"/>
     <ProgressBar
         android:id="@+id/loadingProgressBar"
         android:layout_width="28dp"
-        android:layout_marginTop="15dp"
-        android:layout_below="@id/durationcard"
-        android:layout_centerHorizontal="true"
         android:layout_height="28dp" />
     <TextView
         android:id="@+id/title_cancer"
@@ -42,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/mlresponse"
         android:gravity="left"
-        android:layout_marginLeft="18dp"
+        android:layout_marginLeft="28dp"
         android:layout_marginTop="@dimen/mtrl_card_spacing"
         android:layout_marginRight="@dimen/mtrl_card_spacing"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
@@ -55,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/mlresponse"
-        android:layout_marginLeft="18dp"
+        android:layout_marginLeft="38dp"
         android:layout_marginTop="@dimen/mtrl_card_spacing"
         android:layout_marginRight="@dimen/mtrl_card_spacing"
         android:layout_toRightOf="@id/title_cancer"
@@ -72,7 +69,7 @@
         android:layout_marginLeft="18dp"
         android:layout_marginTop="@dimen/mtrl_card_spacing"
         android:layout_marginRight="@dimen/mtrl_card_spacing"
-        app:wlv_borderColor="@color/colorAccent"
+        app:wlv_borderColor="@color/colorPrimaryDark"
         android:layout_below="@id/title_cancer"
         app:wlv_borderWidth="3dp"
         app:wlv_shapeType="circle"
@@ -91,7 +88,7 @@
         app:wlv_titleBottomColor="@color/colorSlide_1"
         app:wlv_titleBottomSize="35sp"
         app:wlv_waveAmplitude="70"
-        app:wlv_waveColor="@color/colorAccent" />
+        app:wlv_waveColor="@color/colorPrimary" />
     <me.itangqi.waveloadingview.WaveLoadingView
         android:id="@+id/waveLoadingPain"
         android:layout_width="180dp"
@@ -101,7 +98,7 @@
         android:layout_marginRight="@dimen/mtrl_card_spacing"
         android:layout_toRightOf="@id/waveLoadingCancer"
         android:layout_below="@id/title_cancer"
-        app:wlv_borderColor="@color/colorAccent"
+        app:wlv_borderColor="@color/colorPrimaryDark"
         app:wlv_borderWidth="3dp"
         app:wlv_shapeType="circle"
         app:wlv_round_rectangle="true"
@@ -119,7 +116,7 @@
         app:wlv_titleBottomColor="@color/colorSlide_1"
         app:wlv_titleBottomSize="35sp"
         app:wlv_waveAmplitude="70"
-        app:wlv_waveColor="@color/colorAccent" />
+        app:wlv_waveColor="@color/colorPrimary" />
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/paincard"
         android:layout_below="@id/waveLoadingPain"
@@ -129,9 +126,9 @@
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:layout_marginLeft="18dp"
-        android:layout_marginTop="@dimen/mtrl_card_spacing"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="@dimen/mtrl_card_spacing"
-        app:cardBackgroundColor="#BE4C4C"
+        app:cardBackgroundColor="#FDBBBB"
         android:minHeight="200dp">
         <TextView
             android:id="@+id/tempdifferenceLabel"
@@ -158,11 +155,11 @@
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:layout_marginLeft="@dimen/mtrl_card_spacing"
-        android:layout_marginTop="@dimen/mtrl_card_spacing"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="@dimen/mtrl_card_spacing"
         app:cardCornerRadius="6dp"
         app:cardElevation="5dp"
-        app:cardBackgroundColor="#8BC34A"
+        app:cardBackgroundColor="#EAFAC5"
         android:minHeight="200dp">
         <TextView
             android:id="@+id/durationLabel"
@@ -189,7 +186,7 @@
         android:text="Close"
         android:textAllCaps="false"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_below="@id/loadingProgressBar"
+        android:layout_below="@id/durationcard"
         android:layout_centerHorizontal="true"/>
     <!-- <SeekBar
         android:id="@+id/seekBar"

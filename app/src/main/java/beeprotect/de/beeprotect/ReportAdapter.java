@@ -1,6 +1,7 @@
 package beeprotect.de.beeprotect;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +47,14 @@ public class ReportAdapter extends ArrayAdapter<ReportDataModel> implements View
             case R.id.item_info:
                 /*Snackbar.make(v, "Release date " +ReportDataModel.getFeature(), Snackbar.LENGTH_LONG)
                         .setAction("No action", null).show();*/
-                Toast.makeText(mContext, "onClick", Toast.LENGTH_SHORT).show();
+                //TODO
+                Intent intent = new Intent(getContext(),ReportActivity.class);
+                TestData.newInstance().setTemperatureDifference(ReportDataModel.tempDiff);
+                TestData.newInstance().setCancerProbability(ReportDataModel.tensorflow);
+                TestData.newInstance().setPainIntensity(ReportDataModel.pain);
+                //intent.putExtra("report",ReportDataModel);
+                getContext().startActivity(intent);
+                //Toast.makeText(mContext, "onClick", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

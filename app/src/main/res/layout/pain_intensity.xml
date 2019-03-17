@@ -1,27 +1,32 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<RelativeLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@android:color/black">
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:paddingHorizontal="5dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/black"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:id="@+id/text2"
+        android:id="@+id/title"
         android:textColor="#FFFFFF"
-        android:text="Pain Intensity"
+        android:text="Pain Analysis"
         android:textSize="30sp"/>
 
+    <TextView
+        android:id="@+id/progressBarTitle"
+        android:textColor="@android:color/white"
+        android:layout_width="wrap_content"
+        android:text="Pain Severity"
+        android:layout_above="@id/slider1"
+        android:layout_height="wrap_content" />
     <RelativeLayout
         android:id="@+id/progressbar"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
-        android:layout_below="@id/text2"
+        android:layout_below="@id/title"
+        android:layout_toRightOf="@id/progressBarTitle"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:padding="20dp">
@@ -32,7 +37,7 @@
             android:layout_width="80dp"
             android:layout_height="180dp"
             android:max="100"
-            android:progress="93"
+            android:progress="0"
             android:progressDrawable="@drawable/progress_drawable" />
         <TextView
             android:background="#00000000"
@@ -80,12 +85,30 @@
         app:sl_maxValue="100"
         app:sl_value="50"/>-->
 
-    <NumberPicker
+    <!--<NumberPicker
         android:id="@+id/np"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/progressbar"
         android:layout_centerHorizontal="true"
+        />-->
+
+    <TextView
+        android:id="@+id/sliderdurationtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/slider1"
+        android:textColor="@android:color/white"
+        android:text="Pain Duration ( in Weeks )"/>
+
+    <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+        android:id="@+id/sliderduration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sliderdurationtitle"
+        android:gravity="center"
+        app:dsb_min="0"
+        app:dsb_max="20"
         />
 
     <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
@@ -97,6 +120,7 @@
         app:dsb_min="0"
         app:dsb_max="100"
         />
+
 
     <!--<com.gc.materialdesign.views.Slider
         android:layout_width="match_parent"
@@ -114,16 +138,27 @@
 
     </com.gc.materialdesign.views.Slider>-->
 
+    <TextView
+        android:id="@+id/bodytitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_below="@id/sliderduration"
+        android:textColor="@android:color/white"
+        android:text="Select all areas of pain"
+        android:layout_centerHorizontal="true"/>
     <GridView
         android:id="@+id/gridview"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:foregroundGravity="center_horizontal"
         android:numColumns="2"
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
+        android:layout_above="@id/submit"
         android:gravity="center"
-        android:layout_below="@id/slider1"
+        android:layout_below="@id/bodytitle"
         android:listSelector="@drawable/list_selector"
         android:scrollbars="none" />
 
@@ -131,9 +166,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
-        android:layout_marginBottom="44dp"
+        android:layout_marginBottom="14dp"
         android:textSize="20sp"
-        android:layout_below="@id/gridview"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:padding="5dp"
@@ -144,4 +179,3 @@
 <!--    android:layout_below="@id/slider1"-->
 
 </RelativeLayout>
-</ScrollView>

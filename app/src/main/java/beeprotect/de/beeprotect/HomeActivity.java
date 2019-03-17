@@ -26,6 +26,7 @@ public class HomeActivity extends AppCompatActivity {
 
         toolbar = getSupportActionBar();
         toolbar.setBackgroundDrawable(getDrawable(R.color.colorPrimary));
+        toolbar.setIcon(R.drawable.bee);
         // load the store fragment by default
         fragment = new TutorialFragment();
 

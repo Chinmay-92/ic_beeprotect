@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 double diff = calculateAverage(tempDiff);
                 TestData.newInstance().setTemperatureDifference(Math.abs(diff));
                 Log.d("testdata",""+Math.abs(diff));
-                Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "temp diff : "+Math.abs(diff), Toast.LENGTH_SHORT).show();
                 TestData.newInstance().setDuration(textViewTimer.getText().toString());
                 Intent intent=new Intent(getApplicationContext(), TensorflowActivity.class);
                 startActivity(intent);
