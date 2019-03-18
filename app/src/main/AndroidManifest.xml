@@ -31,6 +31,7 @@
         <activity
             android:name=".MainActivity"
             android:label="Heat analysis"
+            android:launchMode="singleInstance"
            >
 
             <!--
@@ -60,6 +61,7 @@
         </provider>
 
         <activity android:name=".ReportActivity"
+            android:launchMode="singleInstance"
             android:label="Report">
 
             <!--
@@ -71,6 +73,7 @@
             -->
         </activity>
         <activity android:name=".ReportListActivity"
+            android:launchMode="singleInstance"
             android:theme="@style/Theme.MaterialComponents.NoActionBar">
 
             <!--<intent-filter>
@@ -81,9 +84,11 @@
         </activity>
         <activity android:name=".TensorflowActivity"
             android:label="Physical Analysis"
+            android:launchMode="singleInstance"
             android:theme="@style/Theme.MaterialComponents.NoActionBar"></activity>
         <activity
             android:name=".HomeActivity"
+            android:launchMode="singleInstance"
             android:label="BeeProtect">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -94,6 +99,7 @@
 
         <activity
             android:label="Pain Intensity"
+            android:launchMode="singleInstance"
             android:name=".Pain_Dialouge_Activity" />
             <!--android:theme="@android:style/Theme.Material.Dialog" />-->
 

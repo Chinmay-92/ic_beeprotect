@@ -21,7 +21,7 @@
         android:gravity="center_horizontal"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="20dp"
-        android:text="Express your pain intensity"
+        android:text="Express your pain severity, pain areas and duration of the pain"
         android:textSize="30sp"
         android:textColor="#000000"/>
 </RelativeLayout>

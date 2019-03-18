@@ -28,6 +28,8 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +98,7 @@ public class ReportlisttabFragment extends Fragment {
                 //Do something after 100ms
                 generateTable();
                 if (emptyText != null)
-                emptyText.setVisibility(View.GONE);
+                    emptyText.setVisibility(View.GONE);
             }
         }, 2000);
 
@@ -169,6 +171,16 @@ public class ReportlisttabFragment extends Fragment {
         return rootView;
     }
 
+    public static void sortAdapter(){
+        allreports.sort(new Comparator<Report>() {
+            @Override
+            public int compare(Report report, Report t1) {
+                return t1.getCreatedAt().compareTo(report.getCreatedAt());
+            }
+        });
+        Collections.sort(ReportDataModels);
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.report_menu, menu);
@@ -194,6 +206,12 @@ public class ReportlisttabFragment extends Fragment {
     public static void generateTable() {
         allreports = TestData.newInstance().getAllreports();
 
+        allreports.sort(new Comparator<Report>() {
+            @Override
+            public int compare(Report report, Report t1) {
+                return t1.getCreatedAt().compareTo(report.getCreatedAt());
+            }
+        });
         for (Report report:allreports) {
             String createdDate = report.getCreatedAt();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
@@ -207,8 +225,10 @@ public class ReportlisttabFragment extends Fragment {
             ReportDataModel model = new ReportDataModel(createdDate, Double.valueOf(report.getTemperatureDifference()), report.getCancerProbability(), report.getPainIntensity());
             if (!ReportDataModels.contains(model)) {
                 ReportDataModels.add(model);
+                Collections.sort(ReportDataModels);
                 adapter.notifyDataSetChanged();
             }
         }
+
     }
 }

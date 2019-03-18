@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import androidx.annotation.Nullable;
 
-public class ReportDataModel implements Serializable {
+public class ReportDataModel implements Serializable, Comparable<ReportDataModel> {
 
     String id;
     String name;
@@ -75,5 +75,10 @@ public class ReportDataModel implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(name, tempDiff, tensorflow, pain);
+    }
+
+    @Override
+    public int compareTo(ReportDataModel o) {
+        return o.getName().compareTo(getName());
     }
 }

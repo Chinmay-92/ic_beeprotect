@@ -137,7 +137,8 @@ public class TensorflowActivity extends AppCompatActivity {
         chart.setDragDecelerationFrictionCoef(0.95f);
 
         //chart.setCenterTextTypeface(tfLight);
-        chart.setCenterText("Results");
+        chart.setCenterText("Results ( % )");
+        chart.setCenterTextSize(20.0f);
 
         chart.setDrawHoleEnabled(true);
         chart.setHoleColor(Color.WHITE);
@@ -658,6 +659,7 @@ public class TensorflowActivity extends AppCompatActivity {
                         double d = Double.valueOf(df2.format(array.getJSONObject(i).getDouble("probability") * 100 ));
                         if( diseasetype.equalsIgnoreCase("notbreasts") && d > 10d ||  diseasetype.equalsIgnoreCase("breasts") && d < 30d ){
                             isBreast = false;
+                            break;
                             //Toast.makeText(tensorflowcontext, "BREAST NOT FOUND", Toast.LENGTH_SHORT).show();
                             //break;
                         }/*else if( diseasetype.equalsIgnoreCase("breasts") && d < 30d  ){
@@ -671,10 +673,11 @@ public class TensorflowActivity extends AppCompatActivity {
                             isNormal = false;
                             break;
                         }
-                        if (d < 10d && d > 3d) {
-                            graphLabels.add(diseasetype.substring(0,2));
+                        if (d < 10d && d > 2d) {
+                            //graphLabels.add(diseasetype.substring(0,2));
+                            graphLabels.add(diseasetype);
                             graphValues.add((float) d);
-                        }else if (d > 10d) {
+                        }else if (d >= 10d) {
                             graphLabels.add(diseasetype);
                             graphValues.add((float) d);
                         }else {

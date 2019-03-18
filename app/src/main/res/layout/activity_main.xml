@@ -10,12 +10,10 @@
     android:background="@android:color/black"
     tools:context=".MainActivity">
 
-    <ScrollView
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/bluetooth_values"
@@ -82,9 +80,23 @@
             android:drawableBottom=
                 "@drawable/animated_clock"/>-->
 
+        <TextView
+            android:id="@+id/loadingLabel"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="10dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center_horizontal"
+            android:layout_below="@id/card_view"
+            android:textColor="@android:color/white"
+            android:text="Temperature difference"
+            />
+
         <at.grabner.circleprogress.CircleProgressView
             android:id="@+id/loadingView"
-            android:layout_below="@id/card_view"
+            android:layout_below="@id/loadingLabel"
+            android:layout_marginTop="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:paddingVertical="5dp"
@@ -105,10 +117,17 @@
             CircleProgressView:cpv_unitToTextScale="0"
             CircleProgressView:cpv_spin="true"
             CircleProgressView:cpv_textMode="Text"
-            CircleProgressView:cpv_text="Test text"
+            CircleProgressView:cpv_text=""
             CircleProgressView:cpv_textSize="18sp"
             CircleProgressView:cpv_value="10"
         />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/loadingView"
+            android:background="#c0c0c0"/>
 
         <!--<com.google.android.material.card.MaterialCardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -142,28 +161,46 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/textViewTimer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/graphsLayout"
-        android:text="00:00"
-        android:textSize="40sp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        android:gravity="center_horizontal"
-        android:layout_marginVertical="5dp"
-        android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/textViewTimerLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginLeft="50dp"
+            android:gravity="center_horizontal"
+            android:paddingLeft="38dp"
+            android:text="Timer: "
+            android:textColor="#FFFFFF"
+            android:layout_below="@id/graphsLayout"
+            android:textColorHint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/textViewTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/graphsLayout"
+            android:layout_marginVertical="5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_toRightOf="@id/textViewTimerLabel"
+            android:gravity="right"
+            android:text="00:00 min."
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textStyle="bold" />
 
 
     <TextView
         android:id="@+id/waitText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textViewTimer"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:lines="2"
+        android:layout_alignParentBottom="true"
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
         android:hint="Please wear and turn on the device and \n wait for the analysis..."
@@ -173,10 +210,10 @@
         android:id="@+id/temptotensor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/waitText"
+        android:layout_below="@id/textViewTimer"
         android:layout_centerHorizontal="true"
         android:padding="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:text="Proceed"
         android:shadowColor="@color/colorPrimaryDark"
         android:textColor="#FFFFFF"
@@ -184,6 +221,5 @@
         />
 
         </RelativeLayout>
-    </ScrollView>
 
 </RelativeLayout>

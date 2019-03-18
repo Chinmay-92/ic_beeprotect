@@ -48,12 +48,15 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.transition.ArcMotion;
 import androidx.transition.ChangeBounds;
@@ -65,6 +68,7 @@ import me.itangqi.waveloadingview.WaveLoadingView;
 import static beeprotect.de.beeprotect.ReportlisttabFragment.adapter;
 import static beeprotect.de.beeprotect.ReportlisttabFragment.allreports;
 import static beeprotect.de.beeprotect.ReportlisttabFragment.generateTable;
+import static beeprotect.de.beeprotect.ReportlisttabFragment.sortAdapter;
 import static com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.val;
 import com.microsoft.windowsazure.mobileservices.*;
 
@@ -111,7 +115,8 @@ public class ReportActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
-
+        ActionBar toolbar = getSupportActionBar();
+        toolbar.setBackgroundDrawable(getDrawable(R.color.colorPrimary));
         duration = findViewById(R.id.duration);
         mProgressBar = (ProgressBar) findViewById(R.id.loadingProgressBar);
         // Initialize the progress bar
@@ -162,13 +167,19 @@ public class ReportActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         Log.d("testdata",TestData.newInstance().toString());
-        waveLoadingPain.setCenterTitle(String.format("%d%%",Integer.parseInt(TestData.newInstance().getPainIntensity())));
+        double pain = Integer.parseInt(TestData.newInstance().getPainIntensity()) / 10;
+        //String painValue = String.format("%d%%", Integer.parseInt(TestData.newInstance().getPainIntensity()));
+        waveLoadingPain.setCenterTitle((int)Math.ceil(pain)+"");
         waveLoadingPain.setProgressValue(Integer.parseInt(TestData.newInstance().getPainIntensity()));
 
         waveLoadingCancer.setCenterTitle(String.format("%d%%",Integer.parseInt(TestData.newInstance().getCancerProbability())));
         waveLoadingCancer.setProgressValue(Integer.parseInt(TestData.newInstance().getCancerProbability()));
-        tempdiff.setText(""+TestData.newInstance().getTemperatureDifference());
-        duration.setText(TestData.newInstance().getDuration());
+        final String DEGREE  = "\u00b0";
+        tempdiff.setText(""+TestData.newInstance().getTemperatureDifference() + DEGREE + "C");
+        if (TestData.newInstance().getDuration() == null || TestData.newInstance().getDuration().equalsIgnoreCase(""))
+            duration.setText("NA");
+        else
+            duration.setText(TestData.newInstance().getDuration()+"min");
 
         //JSONObject body = new JSONObject();
         try {
@@ -210,6 +221,13 @@ public class ReportActivity extends AppCompatActivity {
             allreports = allreports = TestData.newInstance().getAllreports();
             if(allreports == null)
                 allreports = new ArrayList<>();
+            else
+                allreports.sort(new Comparator<Report>() {
+                    @Override
+                    public int compare(Report report, Report t1) {
+                        return t1.getCreatedAt().compareTo(report.getCreatedAt());
+                    }
+                });
             // Get the Mobile Service Table instance to use
 
             mToDoTable = mClient.getTable(Report.class);
@@ -284,8 +302,10 @@ public class ReportActivity extends AppCompatActivity {
                                     TestData.newInstance().addreport(entity);
                                     if (!allreports.contains(item)) {
                                         allreports.add(item);
-                                        if (adapter!=null)
+                                        if (adapter!=null) {
+                                            sortAdapter();
                                             adapter.notifyDataSetChanged();
+                                        }
                                     }
                                 }
                             }
@@ -345,8 +365,10 @@ public class ReportActivity extends AppCompatActivity {
                                     if (!allreports.contains(item)) {
                                         allreports.add(item);
                                         Log.d("item pain",item.painIntensity);
-                                        if (adapter!=null)
+                                        if (adapter!=null) {
+                                            sortAdapter();
                                             adapter.notifyDataSetChanged();
+                                        }
                                     }
                                 }
                             }

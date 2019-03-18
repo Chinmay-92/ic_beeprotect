@@ -209,11 +209,12 @@ public class MainActivity extends AppCompatActivity {
                     else {
                         float diff = Float.valueOf(values.get(values.size()-1)) - Float.valueOf(valuesRight.get(valuesRight.size()-1));
                         String difference = String.format("%.2f", Math.abs(diff));
+                        final String DEGREE  = "\u00b0";
                         if (diff<20f) {
                             tempDiff.add(diff);
                             Log.d("TempDiff", "" + difference);
                             loadingView.setValue(Float.valueOf(difference));
-                            loadingView.setText("" + difference);
+                            loadingView.setText(difference + DEGREE + "C");
                             loadingView.animate();
                         }
                     }
@@ -221,7 +222,8 @@ public class MainActivity extends AppCompatActivity {
                     bytes = 0;
                     //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_SHORT).show();
                 } catch (IOException io) {
-                    mtext.setError("Bluetooth is not available");
+                    Toast.makeText(MainActivity.this, "Bluetooth connection failed, retry", Toast.LENGTH_SHORT).show();
+                    //mtext.setError("Bluetooth is not available");
                     io.printStackTrace();
                 } catch (NullPointerException ne) {
                     ne.printStackTrace();
@@ -527,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void changeText() {
-        int delayTime = 100000; // 2 min
+        int delayTime = 266000; // 2 min
         mtext.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -549,7 +551,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTick(long millisUntilFinished) {
             long ms = millisUntilFinished;
-            String text = String.format("%02d:%02d",
+            String text = String.format("%02d:%02d min.",
                     TimeUnit.MILLISECONDS.toMinutes(ms) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(ms)),
                     TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(ms)));
             textViewTimer.setText(text);

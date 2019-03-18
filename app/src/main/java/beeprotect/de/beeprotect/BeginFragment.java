@@ -16,6 +16,7 @@ import com.squareup.okhttp.OkHttpClient;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import static beeprotect.de.beeprotect.ReportActivity.*;
 import static beeprotect.de.beeprotect.ReportlisttabFragment.ReportDataModels;
@@ -95,9 +96,10 @@ public class BeginFragment extends Fragment {
             //Init local storage
             initLocalStore(getContext()).get();
 
-            if (ReportlisttabFragment.adapter ==null)
-            ReportlisttabFragment.adapter = new ReportAdapter(ReportDataModels,getContext());
-
+            if (ReportlisttabFragment.adapter == null ) {
+                ReportlisttabFragment.adapter = new ReportAdapter(ReportDataModels, getContext());
+                Collections.sort(ReportDataModels);
+            }
             // Create an adapter to bind the items with the view
             if (mAdapter==null)
             mAdapter = new AzureAdapter(getContext(), R.layout.row_item);

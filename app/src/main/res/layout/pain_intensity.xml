@@ -170,10 +170,11 @@
         android:textSize="20sp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_marginTop="10dp"
         android:padding="5dp"
+        android:textAllCaps="false"
         android:textColor="@android:color/white"
-        android:background="@drawable/button_background"
         android:id="@+id/submit"
         />
 <!--    android:layout_below="@id/slider1"-->
